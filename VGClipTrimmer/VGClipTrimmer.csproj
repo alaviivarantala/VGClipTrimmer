@@ -121,11 +121,6 @@
     <Resource Include="img\apex2.png" />
     <Resource Include="img\apex3.png" />
     <Resource Include="img\apex4.PNG" />
-    <Resource Include="img\Papex1.png" />
-    <Resource Include="img\Papex2.png" />
-    <Resource Include="img\Papex3.png" />
-    <Resource Include="img\Papex4.png" />
-    <Resource Include="img\test.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Tesseract.3.3.0\build\Tesseract.targets" Condition="Exists('..\packages\Tesseract.3.3.0\build\Tesseract.targets')" />

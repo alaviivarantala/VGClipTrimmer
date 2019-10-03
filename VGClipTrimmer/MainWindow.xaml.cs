@@ -22,6 +22,9 @@ namespace VGClipTrimmer
             string result2 = TestOCR(path + "apex2.png");
             string result3 = TestOCR(path + "apex3.png");
             string result4 = TestOCR(path + "apex4.png");
+            string result5 = TestOCR(path + "apex5.png");
+            string result6 = TestOCR(path + "apex6.png");
+            string result7 = TestOCR(path + "apex7.png");
 
             System.Windows.Application.Current.Shutdown();
         }
@@ -30,7 +33,7 @@ namespace VGClipTrimmer
         {
             Bitmap image = new Bitmap(path);
             image = CropImage(image);
-            image = ResizeImageDouble(image);
+            image = ResizeImageSlow(image, 800, 180);
             image = CleanImage(image);
 
             image.Save(new FileInfo(path).DirectoryName + "\\" + "P" + new FileInfo(path).Name, System.Drawing.Imaging.ImageFormat.Png);
@@ -61,21 +64,21 @@ namespace VGClipTrimmer
             image = image.Clone(new Rectangle(0, 0, image.Width, image.Height), PixelFormat.Format24bppRgb);
 
             GaussianSharpen gs = new GaussianSharpen();
-            ContrastCorrection cc = new ContrastCorrection(100);
+            ContrastCorrection cc = new ContrastCorrection(50);
+            Invert invert = new Invert();
 
             ColorFiltering cor = new ColorFiltering();
             cor.Red = new AForge.IntRange(155, 255);
             cor.Green = new AForge.IntRange(155, 255);
             cor.Blue = new AForge.IntRange(155, 255);
 
-            Opening open = new Opening();
-            Closing close = new Closing();
-
             BlobsFiltering bc = new BlobsFiltering();
-            bc.MinHeight = 10;
+            bc.CoupledSizeFiltering = false;
+            bc.MinHeight = 25;
+            bc.MaxHeight = 35;
 
-            FiltersSequence seq = new FiltersSequence(gs, cor);
-            //FiltersSequence seq = new FiltersSequence(gs, inverter, open, inverter, bc, inverter, open, cc, cor, bc, inverter);
+            FiltersSequence seq = new FiltersSequence(gs, cc, cor, bc, invert);
+            //FiltersSequence seq = new FiltersSequence(gs, invert, open, invert, bc, inverter, open, cc, cor, bc, inverter);
 
             image = seq.Apply(image);
 
