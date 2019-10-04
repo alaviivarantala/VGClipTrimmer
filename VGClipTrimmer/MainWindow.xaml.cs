@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using Tesseract;
+using Xabe.FFmpeg;
 
 namespace VGClipTrimmer
 {
@@ -20,7 +21,7 @@ namespace VGClipTrimmer
 
 
 
-            System.Windows.Application.Current.Shutdown();
+            //System.Windows.Application.Current.Shutdown();
         }
 
         private void TestBatch()
