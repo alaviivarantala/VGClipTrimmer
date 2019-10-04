@@ -18,6 +18,13 @@ namespace VGClipTrimmer
         {
             InitializeComponent();
 
+
+
+            System.Windows.Application.Current.Shutdown();
+        }
+
+        private void TestBatch()
+        {
             string result1 = TestOCR(path + "apex1.png");
             string result2 = TestOCR(path + "apex2.png");
             string result3 = TestOCR(path + "apex3.png");
@@ -25,8 +32,6 @@ namespace VGClipTrimmer
             string result5 = TestOCR(path + "apex5.png");
             string result6 = TestOCR(path + "apex6.png");
             string result7 = TestOCR(path + "apex7.png");
-
-            System.Windows.Application.Current.Shutdown();
         }
 
         private string TestOCR(string path)

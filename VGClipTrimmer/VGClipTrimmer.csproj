@@ -113,10 +113,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\1.jpg" />
-    <Resource Include="img\2.png" />
-    <Resource Include="img\3.png" />
-    <Resource Include="img\4.png" />
     <Resource Include="img\apex1.png" />
     <Resource Include="img\apex2.png" />
     <Resource Include="img\apex3.png" />
