@@ -1,10 +1,17 @@
 ﻿using AForge.Imaging.Filters;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Tesseract;
 using Xabe.FFmpeg;
+using Xabe.FFmpeg.Enums;
+using Xabe.FFmpeg.Model;
+using Xabe.FFmpeg.Streams;
 
 namespace VGClipTrimmer
 {
@@ -13,26 +20,79 @@ namespace VGClipTrimmer
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        string path = "../../img/";
+        readonly string imgPath = "../../img/";
+        readonly string clips = "C:/clips/";
 
         public MainWindow()
         {
             InitializeComponent();
 
+            FFmpeg.ExecutablesPath = "./ffmpeg";
+        }
 
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            TestVideo();
+        }
 
-            //System.Windows.Application.Current.Shutdown();
+        private async void TestVideo()
+        {
+            string file = clips + "APEX.mp4";
+
+            List<int> hits = await ProcessVideo(file);
+
+            ShutdownApp();
+        }
+        
+        private async Task<List<int>> ProcessVideo(string file)
+        {
+            List<int> timestamps = new List<int>();
+
+            IMediaInfo mediaInfo = await MediaInfo.Get(file);
+            IVideoStream videoStream = mediaInfo.VideoStreams.FirstOrDefault();
+            int count = (int)videoStream.Duration.TotalSeconds;
+
+            List<Task> taskList = new List<Task>();
+
+            for (int i = 0; i < count; i++)
+            {
+                taskList.Add(ProcessFrame(file, i));
+            }
+
+            await Task.WhenAll(taskList);
+
+            return timestamps;
+        }
+
+        private async Task<bool> ProcessFrame(string file, int second)
+        {
+            string output = clips + "temp/" + Guid.NewGuid() + FileExtensions.Png;
+            await Conversion.Snapshot(file, output, TimeSpan.FromSeconds(second)).Start();
+            Bitmap bitmap = new Bitmap(output);
+            string ocrResult = OCRImage(bitmap);
+            bitmap.Dispose();
+            File.Delete(output);
+            if (ocrResult.ToLower().Contains("eliminated") || ocrResult.ToLower().Contains("knocked"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private void ShutdownApp()
+        {
+            System.Windows.Application.Current.Shutdown();
         }
 
         private void TestBatch()
         {
-            string result1 = TestOCR(path + "apex1.png");
-            string result2 = TestOCR(path + "apex2.png");
-            string result3 = TestOCR(path + "apex3.png");
-            string result4 = TestOCR(path + "apex4.png");
-            string result5 = TestOCR(path + "apex5.png");
-            string result6 = TestOCR(path + "apex6.png");
-            string result7 = TestOCR(path + "apex7.png");
+            string result1 = TestOCR(imgPath + "apex1.png");
+            string result2 = TestOCR(imgPath + "apex2.png");
+            string result3 = TestOCR(imgPath + "apex3.png");
+            string result4 = TestOCR(imgPath + "apex4.png");
+            string result5 = TestOCR(imgPath + "apex5.png");
+            string result6 = TestOCR(imgPath + "apex6.png");
+            string result7 = TestOCR(imgPath + "apex7.png");
         }
 
         private string TestOCR(string path)
@@ -67,21 +127,25 @@ namespace VGClipTrimmer
 
         private Bitmap CleanImage(Bitmap image)
         {
-            image = image.Clone(new Rectangle(0, 0, image.Width, image.Height), PixelFormat.Format24bppRgb);
+            image = image.Clone(new Rectangle(0, 0, image.Width, image.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
             GaussianSharpen gs = new GaussianSharpen();
             ContrastCorrection cc = new ContrastCorrection(50);
             Invert invert = new Invert();
 
-            ColorFiltering cor = new ColorFiltering();
-            cor.Red = new AForge.IntRange(155, 255);
-            cor.Green = new AForge.IntRange(155, 255);
-            cor.Blue = new AForge.IntRange(155, 255);
+            ColorFiltering cor = new ColorFiltering
+            {
+                Red = new AForge.IntRange(155, 255),
+                Green = new AForge.IntRange(155, 255),
+                Blue = new AForge.IntRange(155, 255)
+            };
 
-            BlobsFiltering bc = new BlobsFiltering();
-            bc.CoupledSizeFiltering = false;
-            bc.MinHeight = 25;
-            bc.MaxHeight = 35;
+            BlobsFiltering bc = new BlobsFiltering
+            {
+                CoupledSizeFiltering = false,
+                MinHeight = 25,
+                MaxHeight = 35
+            };
 
             FiltersSequence seq = new FiltersSequence(gs, cc, cor, bc, invert);
             //FiltersSequence seq = new FiltersSequence(gs, invert, open, invert, bc, inverter, open, cc, cor, bc, inverter);
@@ -91,11 +155,22 @@ namespace VGClipTrimmer
             return image;
         }
 
+        private string OCRImage(Bitmap image)
+        {
+            image = CropImage(image);
+            image = ResizeImageSlow(image, 800, 180);
+            image = CleanImage(image);
+            return OCR3(image);
+        }
+
         private string OCR2(Bitmap img)
         {
-            TesseractEngine engine = new TesseractEngine(@"tessdata", "eng", EngineMode.Default);
-            Page page = engine.Process(img, PageSegMode.Auto);
-            string result = page.GetText();
+            string result = "";
+            using (TesseractEngine engine = new TesseractEngine(@"tessdata", "eng", EngineMode.Default))
+            {
+                Page page = engine.Process(img, PageSegMode.Auto);
+                result = page.GetText();
+            }
             return result;
         }
 
@@ -119,20 +194,24 @@ namespace VGClipTrimmer
             return res;
         }
 
-        private string reconhecerCaptcha(Image img)
+        private string ReconhecerCaptcha(Image img)
         {
             Bitmap imagem = new Bitmap(img);
             imagem = imagem.Clone(new Rectangle(0, 0, img.Width, img.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             //Erosion erosion = new Erosion();
             //Dilatation dilatation = new Dilatation();
             Invert inverter = new Invert();
-            ColorFiltering cor = new ColorFiltering();
-            cor.Blue = new AForge.IntRange(200, 255);
-            cor.Red = new AForge.IntRange(200, 255);
-            cor.Green = new AForge.IntRange(200, 255);
+            ColorFiltering cor = new ColorFiltering
+            {
+                Blue = new AForge.IntRange(200, 255),
+                Red = new AForge.IntRange(200, 255),
+                Green = new AForge.IntRange(200, 255)
+            };
             Opening open = new Opening();
-            BlobsFiltering bc = new BlobsFiltering();
-            bc.MinHeight = 10;
+            BlobsFiltering bc = new BlobsFiltering
+            {
+                MinHeight = 10
+            };
             //Closing close = new Closing();
             GaussianSharpen gs = new GaussianSharpen();
             ContrastCorrection cc = new ContrastCorrection();
@@ -142,6 +221,8 @@ namespace VGClipTrimmer
             string reconhecido = OCR((Bitmap)image);
 
             //image.Save("C:/img/processedImage.png", System.Drawing.Imaging.ImageFormat.Png);
+
+            imagem.Dispose();
 
             return reconhecido;
         }
