@@ -37,7 +37,20 @@ namespace VGClipTrimmer
 
             watch.Start();
 
-            TestOCRMulti();
+            int ww = 2560;
+            int hh = 1440;
+
+            double widthMultiplier = 0.25;
+            double heightMultiplier = 0.10;
+            int width = (int)(ww * widthMultiplier);
+            int height = (int)(hh * heightMultiplier);
+            int startingPointX = (int)((ww / 2) - (width / 2));
+            int startingPointY = (int)((hh * 0.75) - (height / 2));
+
+            string time = "00:05:23";
+            string video = clips + "APEX.mp4";
+
+            FFmpegPipe.Video(time, video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
 
             watch.Stop();
 
