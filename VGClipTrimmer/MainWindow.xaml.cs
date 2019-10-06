@@ -1,6 +1,7 @@
 ﻿using AForge.Imaging.Filters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -32,7 +33,8 @@ namespace VGClipTrimmer
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            TestVideo();
+            //TestVideo();
+            TestBatch();
         }
 
         private async void TestVideo()
@@ -69,13 +71,13 @@ namespace VGClipTrimmer
             string output = clips + "temp/" + Guid.NewGuid() + FileExtensions.Png;
             await Conversion.Snapshot(file, output, TimeSpan.FromSeconds(second)).Start();
             Bitmap bitmap = new Bitmap(output);
-            string ocrResult = OCRImage(bitmap);
+            //string ocrResult = OCRImage(bitmap);
             bitmap.Dispose();
             File.Delete(output);
-            if (ocrResult.ToLower().Contains("eliminated") || ocrResult.ToLower().Contains("knocked"))
+            /*if (ocrResult.ToLower().Contains("eliminated") || ocrResult.ToLower().Contains("knocked"))
             {
                 return true;
-            }
+            }*/
             return false;
         }
 
@@ -84,8 +86,12 @@ namespace VGClipTrimmer
             System.Windows.Application.Current.Shutdown();
         }
 
-        private void TestBatch()
+        private async void TestBatch()
         {
+            Stopwatch watch = new Stopwatch();
+
+            watch.Start();
+
             string result1 = TestOCR(imgPath + "apex1.png");
             string result2 = TestOCR(imgPath + "apex2.png");
             string result3 = TestOCR(imgPath + "apex3.png");
@@ -93,6 +99,40 @@ namespace VGClipTrimmer
             string result5 = TestOCR(imgPath + "apex5.png");
             string result6 = TestOCR(imgPath + "apex6.png");
             string result7 = TestOCR(imgPath + "apex7.png");
+            
+            /*
+            List<Task> taskList = new List<Task>();
+
+            for (int i = 1; i <= 7; i++)
+            {
+                string path = imgPath + "apex" + i + ".png";
+                taskList.Add(new Task(() => TestOCR(path)));
+            }
+
+            taskList.ForEach(task => task.Start());
+
+            await Task.WhenAll(taskList);
+            */
+
+            /*
+            List<string> pics = new List<string>();
+
+            for (int i = 1; i <= 7; i++)
+            {
+                string path = imgPath + "apex" + i + ".png";
+                pics.Add(path);
+            }
+            */
+            /*
+            Parallel.ForEach(pics, pic =>
+            {
+                string result = TestOCR(pic);
+            });
+            */
+
+            watch.Stop();
+
+            ShutdownApp();
         }
 
         private string TestOCR(string path)
@@ -102,7 +142,7 @@ namespace VGClipTrimmer
             image = ResizeImageSlow(image, 800, 180);
             image = CleanImage(image);
 
-            image.Save(new FileInfo(path).DirectoryName + "\\" + "P" + new FileInfo(path).Name, System.Drawing.Imaging.ImageFormat.Png);
+            //image.Save(new FileInfo(path).DirectoryName + "\\" + "P" + new FileInfo(path).Name, System.Drawing.Imaging.ImageFormat.Png);
             return OCR3(image);
         }
 
