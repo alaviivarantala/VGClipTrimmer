@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Tesseract;
 using VGClipTrimmer.helpers;
@@ -34,19 +34,19 @@ namespace VGClipTrimmer
 
         private void TestBatch()
         {
-            List<TimeSpan> durations = new List<TimeSpan>();
-            List<TimeSpan> durationsOCR = new List<TimeSpan>();
-            List<TimeSpan> durationsFFMPEG = new List<TimeSpan>();
-            List<string> results = new List<string>();
-
             Stopwatch watch = new Stopwatch();
 
             watch.Start();
 
-            //int ww = 2560;
-            //int hh = 1440;
-            int ww = 1280;
-            int hh = 720;
+            string video = clips + "APEX.mp4";
+
+            string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+
+            int ww = int.Parse(lines.Where(x => x.Contains("width=")).FirstOrDefault().Split('=')[1]);
+            int hh = int.Parse(lines.Where(x => x.Contains("height=")).FirstOrDefault().Split('=')[1]);
+
+            string[] duration = lines.Where(x => x.Contains("duration=")).FirstOrDefault().Split('=')[1].Split('.')[0].Split(':');
+            int length = (int)new TimeSpan(int.Parse(duration[0]), int.Parse(duration[1]), int.Parse(duration[2])).TotalSeconds;
 
             double widthMultiplier = 0.25;
             double heightMultiplier = 0.10;
@@ -55,57 +55,14 @@ namespace VGClipTrimmer
             int startingPointX = (int)((ww / 2) - (width / 2));
             int startingPointY = (int)((hh * 0.75) - (height / 2));
 
-            //string time = "00:05:23";
-            //string time = "00:00:06";
-            string video = clips + "APEX.mp4";
-            /*
-            for (int i = 0; i < 10; i++)
+            int maxDegreeOfParallelism = Environment.ProcessorCount;
+            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
             {
-                Stopwatch watch2 = new Stopwatch();
-                watch2.Start();
-                string time = "00:00:0" + (i).ToString();
-                Bitmap resultImage = FFmpegPipe.Video(time, video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+                TimeSpan time = TimeSpan.FromSeconds(i);
+                Bitmap resultImage = FFmpeg.Snapshot(time.ToString(), video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
                 string resultOCR = TestOCRImage(resultImage);
-                results.Add(resultOCR);
-                durations.Add(watch2.Elapsed);
-            }
-            */
-
-            var maxDegreeOfParallelism = Environment.ProcessorCount;
-            Parallel.For(0, 10, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
-            {
-                Stopwatch total = new Stopwatch();
-                total.Start();
-                Stopwatch partWatch = new Stopwatch();
-                partWatch.Start();
-                string time = "00:00:0" + (i).ToString();
-                Bitmap resultImage = FFmpegPipe.Video(time, video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
-                durationsFFMPEG.Add(partWatch.Elapsed);
-                partWatch = new Stopwatch();
-                partWatch.Start();
-                string resultOCR = TestOCRImage(resultImage);
-                durationsOCR.Add(partWatch.Elapsed);
-                results.Add(resultOCR);
-                durations.Add(total.Elapsed);
             });
-
-            Parallel.For(10, 50, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
-            {
-                Stopwatch total = new Stopwatch();
-                total.Start();
-                Stopwatch partWatch = new Stopwatch();
-                partWatch.Start();
-                string time = "00:00:" + (i).ToString();
-                Bitmap resultImage = FFmpegPipe.Video(time, video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
-                durationsFFMPEG.Add(partWatch.Elapsed);
-                partWatch = new Stopwatch();
-                partWatch.Start();
-                string resultOCR = TestOCRImage(resultImage);
-                durationsOCR.Add(partWatch.Elapsed);
-                results.Add(resultOCR);
-                durations.Add(total.Elapsed);
-            });
-
+            
             watch.Stop();
 
             ShutdownApp();
