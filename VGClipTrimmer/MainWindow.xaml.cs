@@ -57,6 +57,9 @@ namespace VGClipTrimmer
             int startingPointX = (int)((ww / 2) - (width / 2));
             int startingPointY = (int)((hh * 0.75) - (height / 2));
 
+            string result = FFmpeg.Snapshots(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+
+            /*
             int maxDegreeOfParallelism = Environment.ProcessorCount;
             Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
             {
@@ -68,7 +71,7 @@ namespace VGClipTrimmer
                     results.Add(time);
                 }
             });
-            
+            */
             watch.Stop();
             ShutdownApp();
         }

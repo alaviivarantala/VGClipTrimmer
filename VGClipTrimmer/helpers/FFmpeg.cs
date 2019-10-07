@@ -65,5 +65,41 @@ namespace VGClipTrimmer.helpers
             return result;
         }
 
+        public static string Snapshots(string video, string width, string height, string x, string y)
+        {
+            string result = string.Empty;
+            string errors = string.Empty;
+
+            Process proc = new Process();
+            proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+            proc.StartInfo.Arguments = "-i " + video + " -filter:v crop=" + width + ":" + height + ":" + x + ":" + y + " -vsync 0 -vf select='not(mod(n,100))' -c:v png -f image2pipe -";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+            proc.StartInfo.RedirectStandardError = true;
+            proc.StartInfo.RedirectStandardOutput = true;
+
+            //proc.OutputDataReceived += (sender, e) => result += e.Data;
+            //proc.ErrorDataReceived += (sender, e) => errors += e.Data;
+
+            proc.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
+            {
+                result += e.Data;
+            });
+
+            proc.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+            {
+                errors += e.Data;
+            });
+
+            proc.Start();
+
+            proc.BeginErrorReadLine();
+            proc.BeginOutputReadLine();
+
+            proc.WaitForExit();
+
+            return result;
+        }
+
     }
 }
