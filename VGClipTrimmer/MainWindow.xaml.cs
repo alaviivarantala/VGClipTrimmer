@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -35,10 +36,11 @@ namespace VGClipTrimmer
         private void TestBatch()
         {
             Stopwatch watch = new Stopwatch();
-
             watch.Start();
 
-            string video = clips + "APEX.mp4";
+            List<TimeSpan> results = new List<TimeSpan>();
+
+            string video = clips + "APEX2.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
@@ -61,10 +63,13 @@ namespace VGClipTrimmer
                 TimeSpan time = TimeSpan.FromSeconds(i);
                 Bitmap resultImage = FFmpeg.Snapshot(time.ToString(), video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
                 string resultOCR = TestOCRImage(resultImage);
+                if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
+                {
+                    results.Add(time);
+                }
             });
             
             watch.Stop();
-
             ShutdownApp();
         }
 
