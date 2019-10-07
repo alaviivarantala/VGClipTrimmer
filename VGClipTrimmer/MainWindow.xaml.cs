@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -33,12 +34,19 @@ namespace VGClipTrimmer
 
         private void TestBatch()
         {
+            List<TimeSpan> durations = new List<TimeSpan>();
+            List<TimeSpan> durationsOCR = new List<TimeSpan>();
+            List<TimeSpan> durationsFFMPEG = new List<TimeSpan>();
+            List<string> results = new List<string>();
+
             Stopwatch watch = new Stopwatch();
 
             watch.Start();
 
-            int ww = 2560;
-            int hh = 1440;
+            //int ww = 2560;
+            //int hh = 1440;
+            int ww = 1280;
+            int hh = 720;
 
             double widthMultiplier = 0.25;
             double heightMultiplier = 0.10;
@@ -47,14 +55,67 @@ namespace VGClipTrimmer
             int startingPointX = (int)((ww / 2) - (width / 2));
             int startingPointY = (int)((hh * 0.75) - (height / 2));
 
-            string time = "00:05:23";
+            //string time = "00:05:23";
+            //string time = "00:00:06";
             string video = clips + "APEX.mp4";
+            /*
+            for (int i = 0; i < 10; i++)
+            {
+                Stopwatch watch2 = new Stopwatch();
+                watch2.Start();
+                string time = "00:00:0" + (i).ToString();
+                Bitmap resultImage = FFmpegPipe.Video(time, video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+                string resultOCR = TestOCRImage(resultImage);
+                results.Add(resultOCR);
+                durations.Add(watch2.Elapsed);
+            }
+            */
 
-            FFmpegPipe.Video(time, video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+            var maxDegreeOfParallelism = Environment.ProcessorCount;
+            Parallel.For(0, 10, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
+            {
+                Stopwatch total = new Stopwatch();
+                total.Start();
+                Stopwatch partWatch = new Stopwatch();
+                partWatch.Start();
+                string time = "00:00:0" + (i).ToString();
+                Bitmap resultImage = FFmpegPipe.Video(time, video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+                durationsFFMPEG.Add(partWatch.Elapsed);
+                partWatch = new Stopwatch();
+                partWatch.Start();
+                string resultOCR = TestOCRImage(resultImage);
+                durationsOCR.Add(partWatch.Elapsed);
+                results.Add(resultOCR);
+                durations.Add(total.Elapsed);
+            });
+
+            Parallel.For(10, 50, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
+            {
+                Stopwatch total = new Stopwatch();
+                total.Start();
+                Stopwatch partWatch = new Stopwatch();
+                partWatch.Start();
+                string time = "00:00:" + (i).ToString();
+                Bitmap resultImage = FFmpegPipe.Video(time, video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+                durationsFFMPEG.Add(partWatch.Elapsed);
+                partWatch = new Stopwatch();
+                partWatch.Start();
+                string resultOCR = TestOCRImage(resultImage);
+                durationsOCR.Add(partWatch.Elapsed);
+                results.Add(resultOCR);
+                durations.Add(total.Elapsed);
+            });
 
             watch.Stop();
 
             ShutdownApp();
+        }
+
+        private string TestOCRImage(Bitmap image)
+        {
+            image = ImageProcessing.ResizeImageSlow(image, 800, 180);
+            image = ImageProcessing.CleanImage(image);
+            return OCR(image);
         }
 
         private void TestOCRMulti()

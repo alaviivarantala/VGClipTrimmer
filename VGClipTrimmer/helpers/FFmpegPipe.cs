@@ -6,12 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace VGClipTrimmer.helpers
 {
     public class FFmpegPipe
     {
-        public static void Video(string time, string video, string width, string height, string x, string y)
+        public static Bitmap Video(string time, string video, string width, string height, string x, string y)
         {
             string result = string.Empty;
             string errors = string.Empty;
@@ -29,11 +30,27 @@ namespace VGClipTrimmer.helpers
             //proc.ErrorDataReceived += (sender, args) => errors += args.Data;
             //proc.OutputDataReceived += (sender, args) => result += args.Data;
             proc.Start();
-            string s1 = proc.StandardOutput.ReadToEnd();
-            string s2 = proc.StandardError.ReadToEnd();
+            //result = proc.StandardOutput.ReadToEnd();
+            //errors = proc.StandardError.ReadToEnd();
+            proc.BeginErrorReadLine();
+
+            PngBitmapDecoder decoder = new PngBitmapDecoder(proc.StandardOutput.BaseStream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+            BitmapSource bitmapSource = decoder.Frames[0];
+
             //proc.BeginOutputReadLine();
             //proc.BeginErrorReadLine();
             proc.WaitForExit();
+
+            Bitmap bitmap;
+            using (var outStream = new MemoryStream())
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(bitmapSource));
+                enc.Save(outStream);
+                bitmap = new Bitmap(outStream);
+            }
+
+            return bitmap;
         }
         /*
         public static void Video2()
