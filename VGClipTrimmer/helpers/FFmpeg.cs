@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
 namespace VGClipTrimmer.helpers
@@ -16,6 +13,7 @@ namespace VGClipTrimmer.helpers
         {
             string result = string.Empty;
             string errors = string.Empty;
+            Bitmap bitmap = null;
 
             Process proc = new Process();
             proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
@@ -27,19 +25,12 @@ namespace VGClipTrimmer.helpers
             proc.Start();
             proc.BeginErrorReadLine();
 
-            PngBitmapDecoder decoder = new PngBitmapDecoder(proc.StandardOutput.BaseStream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-            BitmapSource bitmapSource = decoder.Frames[0];
+            bitmap = new Bitmap(proc.StandardOutput.BaseStream);
+
+            //errors = proc.StandardError.ReadToEnd();
+            //result = proc.StandardOutput.ReadToEnd();
 
             proc.WaitForExit();
-
-            Bitmap bitmap;
-            using (var outStream = new MemoryStream())
-            {
-                BitmapEncoder enc = new BmpBitmapEncoder();
-                enc.Frames.Add(BitmapFrame.Create(bitmapSource));
-                enc.Save(outStream);
-                bitmap = new Bitmap(outStream);
-            }
 
             return bitmap;
         }
