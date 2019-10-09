@@ -46,9 +46,9 @@ namespace VGClipTrimmer.helpers
 
             BlobsFiltering bc = new BlobsFiltering
             {
-                CoupledSizeFiltering = false,
-                MinHeight = 25,
-                MaxHeight = 35
+                CoupledSizeFiltering = true,
+                MinHeight = 45,
+                MaxHeight = 55
             };
 
             FiltersSequence seq = new FiltersSequence(gs, cc, cor, bc, invert);

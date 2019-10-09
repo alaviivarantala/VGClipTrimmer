@@ -40,7 +40,7 @@ namespace VGClipTrimmer
 
             List<TimeSpan> results = new List<TimeSpan>();
 
-            string video = clips + "APEX2.mp4";
+            string video = clips + "APEX3.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
@@ -51,57 +51,49 @@ namespace VGClipTrimmer
             int length = (int)new TimeSpan(int.Parse(duration[0]), int.Parse(duration[1]), int.Parse(duration[2])).TotalSeconds;
 
             double widthMultiplier = 0.25;
-            double heightMultiplier = 0.10;
-            int width = (int)(ww * widthMultiplier);
+            double heightMultiplier = 0.05;
+            int width = (int)(ww * widthMultiplier / 1.75);
             int height = (int)(hh * heightMultiplier);
-            int startingPointX = (int)((ww / 2) - (width / 2));
-            int startingPointY = (int)((hh * 0.75) - (height / 2));
+            int startingPointX = (int)((ww / 2) - (width / 1.4));
+            int startingPointY = (int)((hh * 0.75) - (height / 0.9));
 
-            string result = FFmpeg.Snapshots(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+            //string result = FFmpeg.Snapshots(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
 
-            /*
+            List<int> skippable = new List<int>();
+
             int maxDegreeOfParallelism = Environment.ProcessorCount;
             Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
             {
+                if (skippable.Contains(i))
+                {
+                    return;
+                }
                 TimeSpan time = TimeSpan.FromSeconds(i);
                 Bitmap resultImage = FFmpeg.Snapshot(time.ToString(), video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
                 string resultOCR = TestOCRImage(resultImage);
                 if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
                 {
                     results.Add(time);
+                    skippable.AddRange(new List<int> { i - 2, i - 1, i + 1, i + 2 });
                 }
             });
-            */
+
+            skippable.Sort();
+
             watch.Stop();
             ShutdownApp();
         }
 
         private string TestOCRImage(Bitmap image)
         {
-            image = ImageProcessing.ResizeImageSlow(image, 800, 180);
-            image = ImageProcessing.CleanImage(image);
-            return OCR(image);
+            return OCR(ResizeCleanImage(image));
         }
 
-        private void TestOCRMulti()
+        private Bitmap ResizeCleanImage(Bitmap image)
         {
-            var testFiles = Directory.EnumerateFiles(imgPath);
-
-            var maxDegreeOfParallelism = Environment.ProcessorCount;
-            Parallel.ForEach(testFiles, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (fileName) =>
-            {
-                var imageFile = File.ReadAllBytes(fileName);
-                var texts = TestOCR(fileName);
-            });
-        }
-
-        private string TestOCR(string path)
-        {
-            Bitmap image = new Bitmap(path);
-            image = ImageProcessing.CropImage(image);
-            image = ImageProcessing.ResizeImageSlow(image, 800, 180);
+            image = ImageProcessing.ResizeImageSlow(image, 800, 158);
             image = ImageProcessing.CleanImage(image);
-            return OCR(image);
+            return image;
         }
 
         private string OCR(Bitmap img)
@@ -119,5 +111,18 @@ namespace VGClipTrimmer
             }
             return res;
         }
+
+        private void SaveImage(Bitmap image)
+        {
+            Bitmap original = new Bitmap(image);
+            original.Save(clips + "output1.png");
+
+            Bitmap resized = new Bitmap(ImageProcessing.ResizeImageSlow(image, 800, 158));
+            resized.Save(clips + "output2.png");
+
+            Bitmap cleaned = new Bitmap(ResizeCleanImage(image));
+            cleaned.Save(clips + "output3.png");
+        }
+
     }
 }

@@ -58,10 +58,10 @@ namespace VGClipTrimmer.helpers
             proc.StartInfo.RedirectStandardOutput = true;
             proc.Start();
             proc.BeginErrorReadLine();
-            proc.WaitForExit();
 
             result = proc.StandardOutput.ReadToEnd();
 
+            proc.WaitForExit();
             return result;
         }
 
