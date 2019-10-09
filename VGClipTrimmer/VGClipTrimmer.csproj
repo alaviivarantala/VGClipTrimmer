@@ -90,7 +90,6 @@
     <Compile Include="helpers\FFmpeg.cs" />
     <Compile Include="helpers\ImageProcessing.cs" />
     <Compile Include="helpers\OldOCR.cs" />
-    <Compile Include="helpers\TesseractService.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
