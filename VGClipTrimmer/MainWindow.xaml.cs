@@ -39,8 +39,8 @@ namespace VGClipTrimmer
             watch.Start();
 
             List<TimeSpan> results = new List<TimeSpan>();
-
-            string video = clips + "APEX3.mp4";
+            
+            string video = clips + "APEX.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
