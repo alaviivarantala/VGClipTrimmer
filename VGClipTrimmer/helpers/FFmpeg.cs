@@ -11,26 +11,23 @@ namespace VGClipTrimmer.helpers
     {
         public static Bitmap Snapshot(string time, string video, string width, string height, string x, string y)
         {
-            string result = string.Empty;
-            string errors = string.Empty;
             Bitmap bitmap = null;
 
-            Process proc = new Process();
-            proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
-            proc.StartInfo.Arguments = "-ss " + time + " -i " + video + " -filter:v crop=" + width + ":" + height + ":" + x + ":" + y + " -vframes 1 -c:v png -f image2pipe -";
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.RedirectStandardError = true;
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.Start();
-            proc.BeginErrorReadLine();
+            using (Process process = new Process())
+            {
+                process.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+                process.StartInfo.Arguments = "-ss " + time + " -i " + video + " -filter:v crop=" + width + ":" + height + ":" + x + ":" + y + " -vframes 1 -c:v png -f image2pipe -";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.Start();
+                process.BeginErrorReadLine();
 
-            bitmap = new Bitmap(proc.StandardOutput.BaseStream);
+                bitmap = new Bitmap(process.StandardOutput.BaseStream);
 
-            //errors = proc.StandardError.ReadToEnd();
-            //result = proc.StandardOutput.ReadToEnd();
-
-            proc.WaitForExit();
+                process.WaitForExit();
+            }
 
             return bitmap;
         }
@@ -38,49 +35,37 @@ namespace VGClipTrimmer.helpers
         public static string Info(string video)
         {
             string result = string.Empty;
-            string errors = string.Empty;
 
-            Process proc = new Process();
-            proc.StartInfo.FileName = "./ffmpeg/ffprobe.exe";
-            proc.StartInfo.Arguments = "-hide_banner -show_format -show_streams -pretty " + video;
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.RedirectStandardError = true;
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.Start();
-            proc.BeginErrorReadLine();
+            using (Process process = new Process())
+            {
+                process.StartInfo.FileName = "./ffmpeg/ffprobe.exe";
+                process.StartInfo.Arguments = "-hide_banner -show_format -show_streams -pretty " + video;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.Start();
+                process.BeginErrorReadLine();
 
-            result = proc.StandardOutput.ReadToEnd();
+                result = process.StandardOutput.ReadToEnd();
 
-            proc.WaitForExit();
+                process.WaitForExit();
+            }
+
             return result;
         }
 
-        public static string Snapshots(string video, string width, string height, string x, string y)
+        public static void Snapshots(string video, string width, string height, string x, string y, DataReceivedEventHandler output)
         {
-            string result = string.Empty;
-            string errors = string.Empty;
-
             Process proc = new Process();
             proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
-            proc.StartInfo.Arguments = "-i " + video + " -filter:v crop=" + width + ":" + height + ":" + x + ":" + y + " -vsync 0 -vf select='not(mod(n,100))' -c:v png -f image2pipe -";
+            proc.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -c:v png -f image2pipe -";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardError = true;
             proc.StartInfo.RedirectStandardOutput = true;
 
-            //proc.OutputDataReceived += (sender, e) => result += e.Data;
-            //proc.ErrorDataReceived += (sender, e) => errors += e.Data;
-
-            proc.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
-            {
-                result += e.Data;
-            });
-
-            proc.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
-            {
-                errors += e.Data;
-            });
+            proc.OutputDataReceived += output;
 
             proc.Start();
 
@@ -88,9 +73,6 @@ namespace VGClipTrimmer.helpers
             proc.BeginOutputReadLine();
 
             proc.WaitForExit();
-
-            return result;
         }
-
     }
 }

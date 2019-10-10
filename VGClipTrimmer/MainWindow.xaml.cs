@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using Tesseract;
 using VGClipTrimmer.helpers;
 
@@ -15,7 +17,6 @@ namespace VGClipTrimmer
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        readonly string imgPath = "../../img/";
         readonly string clips = "C:/clips/";
 
         private void ShutdownApp()
@@ -39,8 +40,8 @@ namespace VGClipTrimmer
             watch.Start();
 
             List<TimeSpan> results = new List<TimeSpan>();
-            
-            string video = clips + "APEX3.mp4";
+
+            string video = clips + "APEX.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
@@ -56,29 +57,53 @@ namespace VGClipTrimmer
             int height = (int)(hh * heightMultiplier);
             int startingPointX = (int)((ww / 2) - (width / 1.4));
             int startingPointY = (int)((hh * 0.75) - (height / 0.9));
-
-            //string result = FFmpeg.Snapshots(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
-
-            List<int> skippable = new List<int>();
-
-            int maxDegreeOfParallelism = Environment.ProcessorCount;
+            //
+            /*int maxDegreeOfParallelism = Environment.ProcessorCount;
             Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
             {
-                if (skippable.Contains(i))
-                {
-                    return;
-                }
                 TimeSpan time = TimeSpan.FromSeconds(i);
                 Bitmap resultImage = FFmpeg.Snapshot(time.ToString(), video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+                SaveImage(resultImage);
                 string resultOCR = TestOCRImage(resultImage);
                 if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
                 {
                     results.Add(time);
-                    skippable.AddRange(new List<int> { i - 2, i - 1, i + 1, i + 2 });
+                }
+            });*/
+            //
+            List<string> images = new List<string>();
+            string data = string.Empty;
+            string received = string.Empty;
+            string dd = string.Empty;
+            DataReceivedEventHandler outputHandler = new DataReceivedEventHandler((sender, e) =>
+            {
+                received = e.Data;
+                if (!string.IsNullOrWhiteSpace(data) && !string.IsNullOrWhiteSpace(received) && received.Contains("PNG"))
+                {
+                    int index = received.IndexOf("‰PNG");
+                    data += received.Substring(0, index);
+                    images.Add(data);
+                    data = received.Substring(index, received.Length - index);
+                }
+                else
+                {
+                    data += received;
                 }
             });
 
-            skippable.Sort();
+            FFmpeg.Snapshots(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), outputHandler);
+
+            for (int i = 0; i < images.Count; i++)
+            {
+                Bitmap bitmap = new Bitmap(new MemoryStream(Encoding.UTF8.GetBytes(images[i])));
+                SaveImage(bitmap);
+                string resultOCR = TestOCRImage(bitmap);
+                if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
+                {
+                    TimeSpan time = TimeSpan.FromSeconds(i);
+                    results.Add(time);
+                }
+            }
 
             watch.Stop();
             ShutdownApp();
@@ -123,6 +148,5 @@ namespace VGClipTrimmer
             Bitmap cleaned = new Bitmap(ResizeCleanImage(image));
             cleaned.Save(clips + "output3.png");
         }
-
     }
 }
