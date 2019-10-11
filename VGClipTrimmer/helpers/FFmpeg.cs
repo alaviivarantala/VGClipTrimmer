@@ -55,11 +55,11 @@ namespace VGClipTrimmer.helpers
             return result;
         }
 
-        public static void Snapshots(string video, string width, string height, string x, string y, DataReceivedEventHandler output)
+        public static void SnapshotsToMemory(string video, string width, string height, string x, string y, DataReceivedEventHandler output)
         {
             Process proc = new Process();
             proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
-            proc.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -c:v png -f image2pipe -";
+            proc.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png -f image2pipe -";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardError = true;
@@ -74,5 +74,36 @@ namespace VGClipTrimmer.helpers
 
             proc.WaitForExit();
         }
+
+        public static Process SnapshotsToFileProcess(string video, string width, string height, string x, string y)
+        {
+            string filePath = new FileInfo(video).DirectoryName;
+            string tempPath = Path.Combine(filePath, "temp");
+
+            Process process = new Process();
+            process.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+            process.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png " + tempPath + "\\%d.png";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardError = false;
+            process.StartInfo.RedirectStandardOutput = false;
+
+            return process;
+        }
+
+        public static void SnapshotsToFileVoid(string video, string width, string height, string x, string y, string tempPath)
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+            process.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png " + tempPath + "\\%d.png";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardError = false;
+            process.StartInfo.RedirectStandardOutput = false;
+
+            process.Start();
+            process.WaitForExit();
+        }
+
     }
 }
