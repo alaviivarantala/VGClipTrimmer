@@ -87,6 +87,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="helpers\ByteProcessing.cs" />
     <Compile Include="helpers\FFmpeg.cs" />
     <Compile Include="helpers\ImageProcessing.cs" />
     <Compile Include="helpers\OldOCR.cs" />
