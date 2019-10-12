@@ -57,7 +57,7 @@ namespace VGClipTrimmer.helpers
             return bitmap;
         }
 
-        public static void SnapshotsToMemory(string video, string width, string height, string x, string y)
+        public static void SnapshotsToMemory(string video, string width, string height, string x, string y, EventHandler handler)
         {
             Process proc = new Process();
             proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
@@ -70,16 +70,15 @@ namespace VGClipTrimmer.helpers
             proc.Start();
             proc.BeginErrorReadLine();
 
-            List<Bitmap> images = new List<Bitmap>();
-
             using (BinaryReader reader = new BinaryReader(proc.StandardOutput.BaseStream))
             {
                 byte[] readBytes = null;
                 byte[] stash = new byte[0];
                 bool firstPass = true;
+                int frameCount = 0;
                 do
                 {
-                    readBytes = reader.ReadBytes(1000);
+                    readBytes = reader.ReadBytes(4096);
                     byte[] pattern = new byte[] { 137, 80, 78, 71 };
                     int[] results = ByteProcessing.Locate(readBytes, pattern);
 
@@ -95,6 +94,7 @@ namespace VGClipTrimmer.helpers
                             for (int i = 0; i < results.Length; i++)
                             {
                                 byte[] image = new byte[0];
+
                                 if (i == 0)
                                 {
                                     image = stash.ToList().Concat(readBytes.Take(results[i]).ToList()).ToArray();
@@ -107,17 +107,11 @@ namespace VGClipTrimmer.helpers
                                 {
                                     image = readBytes.Skip(results[i]).Take(results[i + 1]).ToArray();
                                 }
+
                                 if (image.Length > 0)
                                 {
-                                    string testiPath = Path.Combine(@"c:\", "clips", "testit");
-                                    int count = Directory.EnumerateFiles(testiPath).Count();
-                                    //File.WriteAllBytes(Path.Combine(testiPath, count + ".png"), image);
-
-                                    using (MemoryStream ms = new MemoryStream(image.ToArray()))
-                                    {
-                                        images.Add(new Bitmap(ms));
-                                    }
-
+                                    handler.Invoke(null, new ImagesEventArgs(frameCount, image));
+                                    frameCount++;
                                 }
                             }
                         }
@@ -127,9 +121,7 @@ namespace VGClipTrimmer.helpers
                         }
                     }
                 } while (readBytes.Length != 0);
-
             }
-
             proc.WaitForExit();
         }
 

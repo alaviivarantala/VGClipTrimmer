@@ -37,10 +37,9 @@ namespace VGClipTrimmer
         private void TestBatch()
         {
             Stopwatch watch = new Stopwatch();
+            watch.Start();
 
-            List<TimeSpan> results = new List<TimeSpan>();
-
-            string video = clips + "APEX.mp4";
+            string video = clips + "APEX2.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
@@ -57,11 +56,43 @@ namespace VGClipTrimmer
             int startingPointX = (int)((ww / 2) - (width / 1.4));
             int startingPointY = (int)((hh * 0.75) - (height / 0.9));
 
-            watch.Start();
-            FFmpeg.SnapshotsToMemory(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+            List<Task<Tuple<int, bool>>> ocrTasks = new List<Task<Tuple<int, bool>>>();
+
+            EventHandler handler = new EventHandler((sender, e) =>
+            {
+                ImagesEventArgs args = e as ImagesEventArgs;
+                ocrTasks.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)));
+            });
+
+            FFmpeg.SnapshotsToMemory(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), handler);
+
+            Task.WaitAll(ocrTasks.ToArray());
+
+            List<TimeSpan> results = ocrTasks.Where(task => task.Result.Item2).Select(task => task.Result.Item1).Select(time => TimeSpan.FromSeconds(time)).ToList();
 
             watch.Stop();
             ShutdownApp();
+        }
+
+        private Tuple<int, bool> OCRImage(int seconds, byte[] imageBytes)
+        {
+            bool result = false;
+            using (MemoryStream memoryStream = new MemoryStream(imageBytes))
+            {
+                using (Bitmap image = new Bitmap(memoryStream))
+                {
+                    string resultOCR = TestOCRImage(image);
+                    if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
+                    {
+                        TimeSpan time = TimeSpan.FromSeconds(seconds);
+                        result = true;
+                    }
+                    Bitmap temp = new Bitmap(image);
+                    temp.Save(clips + "tempb/" + seconds + ".png");
+                    temp.Dispose();
+                }
+            }
+            return new Tuple<int, bool>(seconds, result);
         }
 
         private void OldMethods()
