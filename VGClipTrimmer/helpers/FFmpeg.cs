@@ -74,50 +74,62 @@ namespace VGClipTrimmer.helpers
             {
                 byte[] readBytes = null;
                 byte[] stash = new byte[0];
-                bool firstPass = true;
+                byte[] image = new byte[0];
                 int frameCount = 0;
+
                 do
                 {
                     readBytes = reader.ReadBytes(4096);
-                    byte[] pattern = new byte[] { 137, 80, 78, 71 };
+
+                    byte[] pattern = new byte[] { 73, 69, 78, 68, 174, 66, 96, 130 };
                     int[] results = ByteProcessing.Locate(readBytes, pattern);
 
-                    if (firstPass && results.Length == 1)
+                    for (int i = 0; i < results.Length; i++)
+                    {
+                        results[i] += pattern.Length;
+                    }
+
+                    if (results.Length == 0)
                     {
                         stash = stash.ToList().Concat(readBytes.ToList()).ToArray();
-                        firstPass = false;
+                    }
+                    else if (results.Length == 1)
+                    {
+                        image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                        handler.Invoke(null, new ImagesEventArgs(frameCount, image));
+                        frameCount++;
+                        stash = readBytes.Skip(results[0]).ToArray();
+                    }
+                    else if (results.Length == 2)
+                    {
+                        image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                        handler.Invoke(null, new ImagesEventArgs(frameCount, image));
+                        frameCount++;
+                        image = readBytes.Skip(results[0]).Take(results[1] - results[0]).ToArray();
+                        handler.Invoke(null, new ImagesEventArgs(frameCount, image));
+                        frameCount++;
+                        stash = readBytes.Skip(results[1]).ToArray();
                     }
                     else
                     {
-                        if (results.Length > 0)
+                        for (int i = 0; i < results.Length; i++)
                         {
-                            for (int i = 0; i < results.Length; i++)
+                            if (i == 0)
                             {
-                                byte[] image = new byte[0];
-
-                                if (i == 0)
-                                {
-                                    image = stash.ToList().Concat(readBytes.Take(results[i]).ToList()).ToArray();
-                                }
-                                else if (i == results.Length - 1)
-                                {
-                                    stash = readBytes.Skip(results[i]).ToArray();
-                                }
-                                else
-                                {
-                                    image = readBytes.Skip(results[i]).Take(results[i + 1]).ToArray();
-                                }
-
-                                if (image.Length > 0)
-                                {
-                                    handler.Invoke(null, new ImagesEventArgs(frameCount, image));
-                                    frameCount++;
-                                }
+                                image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                                handler.Invoke(null, new ImagesEventArgs(frameCount, image));
+                                frameCount++;
                             }
-                        }
-                        else
-                        {
-                            stash = stash.ToList().Concat(readBytes.ToList()).ToArray();
+                            else if (i == results.Length - 1)
+                            {
+                                stash = readBytes.Skip(results[i]).ToArray();
+                            }
+                            else
+                            {
+                                image = readBytes.Skip(results[i]).Take(results[i + 1] - results[i]).ToArray();
+                                handler.Invoke(null, new ImagesEventArgs(frameCount, image));
+                                frameCount++;
+                            }
                         }
                     }
                 } while (readBytes.Length != 0);

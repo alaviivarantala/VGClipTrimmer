@@ -31,6 +31,16 @@ namespace VGClipTrimmer
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
+            /*
+            BinaryReader reader = new BinaryReader(new FileStream(clips + "1.png", FileMode.Open));
+
+            byte[] bytes = reader.ReadBytes(50000);
+
+            byte[] pattern = new byte[] { 73, 69, 78, 68, 174, 66, 96, 130 };
+            int[] results = ByteProcessing.Locate(bytes, pattern);
+
+            bytes = bytes.Take(results[0] + pattern.Length).ToArray();
+            */
             TestBatch();
         }
 
@@ -39,7 +49,7 @@ namespace VGClipTrimmer
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            string video = clips + "APEX2.mp4";
+            string video = clips + "APEX3.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
@@ -56,12 +66,16 @@ namespace VGClipTrimmer
             int startingPointX = (int)((ww / 2) - (width / 1.4));
             int startingPointY = (int)((hh * 0.75) - (height / 0.9));
 
-            List<Task<Tuple<int, bool>>> ocrTasks = new List<Task<Tuple<int, bool>>>();
+            //List<Task<Tuple<int, bool>>> ocrTasks = new List<Task<Tuple<int, bool>>>();
+            List<Tuple<int, bool>> tuples = new List<Tuple<int, bool>>();
+
+            Task lastTask = null;
 
             EventHandler handler = new EventHandler((sender, e) =>
             {
                 ImagesEventArgs args = e as ImagesEventArgs;
-                ocrTasks.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)));
+                //tuples.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)).Result);
+                ocrTasks.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)).ConfigureAwait(false));
             });
 
             FFmpeg.SnapshotsToMemory(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), handler);
@@ -70,8 +84,13 @@ namespace VGClipTrimmer
 
             List<TimeSpan> results = ocrTasks.Where(task => task.Result.Item2).Select(task => task.Result.Item1).Select(time => TimeSpan.FromSeconds(time)).ToList();
 
+            //lastTask.Wait();
+
+            //List<TimeSpan> results = tuples.Select(time => TimeSpan.FromSeconds(time.Item1)).ToList();
+
             watch.Stop();
             ShutdownApp();
+            
         }
 
         private Tuple<int, bool> OCRImage(int seconds, byte[] imageBytes)
@@ -87,9 +106,11 @@ namespace VGClipTrimmer
                         TimeSpan time = TimeSpan.FromSeconds(seconds);
                         result = true;
                     }
+                    /*
                     Bitmap temp = new Bitmap(image);
                     temp.Save(clips + "tempb/" + seconds + ".png");
                     temp.Dispose();
+                    */
                 }
             }
             return new Tuple<int, bool>(seconds, result);
