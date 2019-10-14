@@ -149,23 +149,76 @@ namespace VGClipTrimmer.helpers
             proc.EnableRaisingEvents = true;
             proc.Start();
 
-            List<byte[]> results = new List<byte[]>();
+            List<byte[]> resultsList = new List<byte[]>();
 
             using (BinaryReader reader = new BinaryReader(proc.StandardOutput.BaseStream))
             {
-                byte[] readBytes = new byte[0];
+                byte[] readBytes = null;
+                byte[] stash = new byte[0];
+                byte[] image = new byte[0];
+                int frameCount = 0;
 
                 do
                 {
                     readBytes = reader.ReadBytes(40960);
-                    results.Add(readBytes);
 
+                    byte[] pattern = new byte[] { 73, 69, 78, 68, 174, 66, 96, 130 };
+                    int[] results = ByteProcessing.Locate(readBytes, pattern);
+
+                    for (int i = 0; i < results.Length; i++)
+                    {
+                        results[i] += pattern.Length;
+                    }
+
+                    if (results.Length == 0)
+                    {
+                        stash = stash.ToList().Concat(readBytes.ToList()).ToArray();
+                    }
+                    else if (results.Length == 1)
+                    {
+                        image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                        resultsList.Add(image);
+                        frameCount++;
+                        stash = readBytes.Skip(results[0]).ToArray();
+                    }
+                    else if (results.Length == 2)
+                    {
+                        image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                        resultsList.Add(image);
+                        frameCount++;
+                        image = readBytes.Skip(results[0]).Take(results[1] - results[0]).ToArray();
+                        resultsList.Add(image);
+                        frameCount++;
+                        stash = readBytes.Skip(results[1]).ToArray();
+                    }
+                    else
+                    {
+                        for (int i = 0; i < results.Length; i++)
+                        {
+                            if (i == 0)
+                            {
+                                image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                                resultsList.Add(image);
+                                frameCount++;
+                            }
+                            else if (i == results.Length - 1)
+                            {
+                                stash = readBytes.Skip(results[i]).ToArray();
+                            }
+                            else
+                            {
+                                image = readBytes.Skip(results[i]).Take(results[i + 1] - results[i]).ToArray();
+                                resultsList.Add(image);
+                                frameCount++;
+                            }
+                        }
+                    }
                 } while (readBytes.Length != 0);
             }
 
             proc.WaitForExit();
 
-            return results;
+            return resultsList;
         }
 
         public static Process SnapshotsToFileProcess(string video, string width, string height, string x, string y)
