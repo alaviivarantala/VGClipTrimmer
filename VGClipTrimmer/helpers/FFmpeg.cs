@@ -64,12 +64,11 @@ namespace VGClipTrimmer.helpers
             proc.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png -f image2pipe -";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.RedirectStandardError = true;
+            proc.StartInfo.RedirectStandardError = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.EnableRaisingEvents = true;
             proc.Start();
-            proc.BeginErrorReadLine();
-
+            
             using (BinaryReader reader = new BinaryReader(proc.StandardOutput.BaseStream))
             {
                 byte[] readBytes = null;
@@ -134,7 +133,39 @@ namespace VGClipTrimmer.helpers
                     }
                 } while (readBytes.Length != 0);
             }
+            
             proc.WaitForExit();
+        }
+
+        public static List<byte[]> SnapshotsToList(string video, string width, string height, string x, string y)
+        {
+            Process proc = new Process();
+            proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+            proc.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png -f image2pipe -";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+            proc.StartInfo.RedirectStandardError = false;
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.EnableRaisingEvents = true;
+            proc.Start();
+
+            List<byte[]> results = new List<byte[]>();
+
+            using (BinaryReader reader = new BinaryReader(proc.StandardOutput.BaseStream))
+            {
+                byte[] readBytes = new byte[0];
+
+                do
+                {
+                    readBytes = reader.ReadBytes(40960);
+                    results.Add(readBytes);
+
+                } while (readBytes.Length != 0);
+            }
+
+            proc.WaitForExit();
+
+            return results;
         }
 
         public static Process SnapshotsToFileProcess(string video, string width, string height, string x, string y)

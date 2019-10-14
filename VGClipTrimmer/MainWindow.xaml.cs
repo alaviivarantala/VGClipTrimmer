@@ -29,7 +29,7 @@ namespace VGClipTrimmer
             InitializeComponent();
         }
 
-        private void Window_ContentRendered(object sender, EventArgs e)
+        private async void Window_ContentRendered(object sender, EventArgs e)
         {
             /*
             BinaryReader reader = new BinaryReader(new FileStream(clips + "1.png", FileMode.Open));
@@ -41,7 +41,9 @@ namespace VGClipTrimmer
 
             bytes = bytes.Take(results[0] + pattern.Length).ToArray();
             */
-            TestBatch();
+            await Task.Run(() => TestBatch());
+
+            ShutdownApp();
         }
 
         private void TestBatch()
@@ -49,7 +51,7 @@ namespace VGClipTrimmer
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            string video = clips + "APEX3.mp4";
+            string video = clips + "APEX2.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
@@ -69,28 +71,31 @@ namespace VGClipTrimmer
             //List<Task<Tuple<int, bool>>> ocrTasks = new List<Task<Tuple<int, bool>>>();
             List<Tuple<int, bool>> tuples = new List<Tuple<int, bool>>();
 
-            Task lastTask = null;
+            //Task lastTask = null;
 
             EventHandler handler = new EventHandler((sender, e) =>
             {
                 ImagesEventArgs args = e as ImagesEventArgs;
+                tuples.Add(OCRImage(args.Seconds, args.Image));
                 //tuples.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)).Result);
-                ocrTasks.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)).ConfigureAwait(false));
+                //ocrTasks.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)).ConfigureAwait(false));
             });
 
-            FFmpeg.SnapshotsToMemory(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), handler);
-
+            //FFmpeg.SnapshotsToMemory(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), handler);
+            /*
             Task.WaitAll(ocrTasks.ToArray());
 
             List<TimeSpan> results = ocrTasks.Where(task => task.Result.Item2).Select(task => task.Result.Item1).Select(time => TimeSpan.FromSeconds(time)).ToList();
-
+            */
             //lastTask.Wait();
 
-            //List<TimeSpan> results = tuples.Select(time => TimeSpan.FromSeconds(time.Item1)).ToList();
+            List<TimeSpan> results = tuples.Where(result => result.Item2).Select(time => TimeSpan.FromSeconds(time.Item1)).ToList();
+
+            var r = FFmpeg.SnapshotsToList(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
 
             watch.Stop();
-            ShutdownApp();
-            
+
+            int zzz = 0;
         }
 
         private Tuple<int, bool> OCRImage(int seconds, byte[] imageBytes)
