@@ -137,7 +137,7 @@ namespace VGClipTrimmer.helpers
             proc.WaitForExit();
         }
 
-        public static List<byte[]> SnapshotsToList(string video, string width, string height, string x, string y)
+        public static List<byte[]> SnapshotsToList(string video, string width, string height, string x, string y, int readSize)
         {
             Process proc = new Process();
             proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
@@ -160,7 +160,7 @@ namespace VGClipTrimmer.helpers
 
                 do
                 {
-                    readBytes = reader.ReadBytes(40960);
+                    readBytes = reader.ReadBytes(readSize);
 
                     byte[] pattern = new byte[] { 73, 69, 78, 68, 174, 66, 96, 130 };
                     int[] results = ByteProcessing.Locate(readBytes, pattern);
@@ -181,16 +181,6 @@ namespace VGClipTrimmer.helpers
                         frameCount++;
                         stash = readBytes.Skip(results[0]).ToArray();
                     }
-                    else if (results.Length == 2)
-                    {
-                        image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
-                        resultsList.Add(image);
-                        frameCount++;
-                        image = readBytes.Skip(results[0]).Take(results[1] - results[0]).ToArray();
-                        resultsList.Add(image);
-                        frameCount++;
-                        stash = readBytes.Skip(results[1]).ToArray();
-                    }
                     else
                     {
                         for (int i = 0; i < results.Length; i++)
@@ -201,15 +191,16 @@ namespace VGClipTrimmer.helpers
                                 resultsList.Add(image);
                                 frameCount++;
                             }
-                            else if (i == results.Length - 1)
-                            {
-                                stash = readBytes.Skip(results[i]).ToArray();
-                            }
                             else
                             {
-                                image = readBytes.Skip(results[i]).Take(results[i + 1] - results[i]).ToArray();
+                                image = readBytes.Skip(results[i - 1]).Take(results[i] - results[i - 1]).ToArray();
                                 resultsList.Add(image);
                                 frameCount++;
+
+                                if (i == results.Length - 1)
+                                {
+                                    stash = readBytes.Skip(results[i]).ToArray();
+                                }
                             }
                         }
                     }

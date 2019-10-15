@@ -31,19 +31,8 @@ namespace VGClipTrimmer
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            /*
-            BinaryReader reader = new BinaryReader(new FileStream(clips + "1.png", FileMode.Open));
-
-            byte[] bytes = reader.ReadBytes(50000);
-
-            byte[] pattern = new byte[] { 73, 69, 78, 68, 174, 66, 96, 130 };
-            int[] results = ByteProcessing.Locate(bytes, pattern);
-
-            bytes = bytes.Take(results[0] + pattern.Length).ToArray();
-            */
             await Task.Run(() => TestBatch());
-
-            ShutdownApp();
+            //ShutdownApp();
         }
 
         private void TestBatch()
@@ -68,40 +57,31 @@ namespace VGClipTrimmer
             int startingPointX = (int)((ww / 2) - (width / 1.4));
             int startingPointY = (int)((hh * 0.75) - (height / 0.9));
 
-            //List<Task<Tuple<int, bool>>> ocrTasks = new List<Task<Tuple<int, bool>>>();
             List<Tuple<int, bool>> tuples = new List<Tuple<int, bool>>();
-
-            //Task lastTask = null;
 
             EventHandler handler = new EventHandler((sender, e) =>
             {
                 ImagesEventArgs args = e as ImagesEventArgs;
                 tuples.Add(OCRImage(args.Seconds, args.Image));
-                //tuples.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)).Result);
-                //ocrTasks.Add(Task.Run(() => OCRImage(args.Seconds, args.Image)).ConfigureAwait(false));
             });
 
-            //FFmpeg.SnapshotsToMemory(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), handler);
-            /*
-            Task.WaitAll(ocrTasks.ToArray());
-
-            List<TimeSpan> results = ocrTasks.Where(task => task.Result.Item2).Select(task => task.Result.Item1).Select(time => TimeSpan.FromSeconds(time)).ToList();
-            */
-            //lastTask.Wait();
-
-            List<byte[]> images = FFmpeg.SnapshotsToList(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
-
+            Stopwatch watch1 = new Stopwatch();
+            watch1.Start();
+            List<byte[]> images = FFmpeg.SnapshotsToList(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), 307200);
+            watch1.Stop();
+            Stopwatch watch2 = new Stopwatch();
+            watch2.Start();
             int maxDegreeOfParallelism = Environment.ProcessorCount;
             Parallel.For(0, images.Count, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
             {
                 tuples.Add(OCRImage(i, images[i]));
             });
+            watch2.Stop();
 
             List<TimeSpan> results = tuples.Where(result => result.Item2).Select(time => TimeSpan.FromSeconds(time.Item1)).ToList();
 
             watch.Stop();
-
-            int zzz = 0;
+            int xx = 0;
         }
 
         private Tuple<int, bool> OCRImage(int seconds, byte[] imageBytes)
@@ -117,137 +97,9 @@ namespace VGClipTrimmer
                         TimeSpan time = TimeSpan.FromSeconds(seconds);
                         result = true;
                     }
-                    /*
-                    Bitmap temp = new Bitmap(image);
-                    temp.Save(clips + "tempb/" + seconds + ".png");
-                    temp.Dispose();
-                    */
                 }
             }
             return new Tuple<int, bool>(seconds, result);
-        }
-
-        private void OldMethods()
-        {
-            /*
-            string directoryPath = new FileInfo(video).DirectoryName;
-            string tempPath = Path.Combine(directoryPath, "temp");
-
-            if (!Directory.Exists(tempPath))
-            {
-                Directory.CreateDirectory(tempPath);
-            }
-
-            FFmpeg.SnapshotsToFileVoid(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), tempPath);
-
-            int fileCount = Directory.GetFiles(tempPath).Length;
-
-            int maxDegreeOfParallelism = Environment.ProcessorCount;
-            Parallel.For(0, fileCount, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
-            {
-                string filePath = Path.Combine(tempPath, (i + 1).ToString() + ".png");
-                TimeSpan time = TimeSpan.FromSeconds(i);
-                Bitmap image = (Bitmap)Image.FromFile(filePath);
-                string resultOCR = TestOCRImage(image);
-                if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
-                {
-                    results.Add(time);
-                }
-                image.Dispose();
-                File.Delete(filePath);
-            });
-            */
-            /*
-            using (FileSystemWatcher watcher = new FileSystemWatcher())
-            {
-                string filePath = new FileInfo(video).DirectoryName;
-                string tempPath = Path.Combine(filePath, "temp");
-
-                if (!Directory.Exists(tempPath))
-                {
-                    Directory.CreateDirectory(tempPath);
-                }
-
-                watcher.Path = tempPath;
-
-                watcher.NotifyFilter = NotifyFilters.LastAccess
-                                     | NotifyFilters.LastWrite
-                                     | NotifyFilters.FileName
-                                     | NotifyFilters.DirectoryName;
-
-                watcher.Filter = "*.png";
-
-                watcher.Created += new FileSystemEventHandler((sender, e) =>
-                {
-                    TimeSpan time = TimeSpan.FromSeconds(int.Parse(e.Name.Split('.')[0]));
-                    Bitmap image = (Bitmap)Image.FromFile(e.FullPath);
-                    string resultOCR = TestOCRImage(image);
-                    if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
-                    {
-                        results.Add(time);
-                    }
-                    image.Dispose();
-                    File.Delete(e.FullPath);
-                });
-
-                watcher.EnableRaisingEvents = true;
-
-                Process ffmpeg = FFmpeg.SnapshotsToFile(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
-
-                ffmpeg.Start();
-                ffmpeg.WaitForExit();
-            }
-            */
-
-            /*
-            int maxDegreeOfParallelism = Environment.ProcessorCount;
-            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
-            {
-                TimeSpan time = TimeSpan.FromSeconds(i);
-                Bitmap resultImage = FFmpeg.Snapshot(time.ToString(), video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
-                SaveImage(resultImage);
-                string resultOCR = TestOCRImage(resultImage);
-                if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
-                {
-                    results.Add(time);
-                }
-            });
-            */
-            /*
-            List<string> images = new List<string>();
-            string data = string.Empty;
-            string received = string.Empty;
-            string dd = string.Empty;
-            DataReceivedEventHandler outputHandler = new DataReceivedEventHandler((sender, e) =>
-            {
-                received = e.Data;
-                if (!string.IsNullOrWhiteSpace(data) && !string.IsNullOrWhiteSpace(received) && received.Contains("PNG"))
-                {
-                    int index = received.IndexOf("‰PNG");
-                    data += received.Substring(0, index);
-                    images.Add(data);
-                    data = received.Substring(index, received.Length - index);
-                }
-                else
-                {
-                    data += received;
-                }
-            });
-
-            FFmpeg.SnapshotsToMemory(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), outputHandler);
-
-            for (int i = 0; i < images.Count; i++)
-            {
-                Bitmap bitmap = new Bitmap(new MemoryStream(Encoding.UTF8.GetBytes(images[i])));
-                SaveImage(bitmap);
-                string resultOCR = TestOCRImage(bitmap);
-                if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
-                {
-                    TimeSpan time = TimeSpan.FromSeconds(i);
-                    results.Add(time);
-                }
-            }
-            */
         }
 
         private string TestOCRImage(Bitmap image)
@@ -288,6 +140,14 @@ namespace VGClipTrimmer
 
             Bitmap cleaned = new Bitmap(ResizeCleanImage(image));
             cleaned.Save(clips + "output3.png");
+        }
+
+        private void SaveImage(Image image, string name)
+        {
+            using (Bitmap temp = new Bitmap(image))
+            {
+                temp.Save(clips + "tempb/" + name + ".png");
+            }
         }
     }
 }
