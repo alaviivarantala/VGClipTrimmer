@@ -51,7 +51,7 @@ namespace VGClipTrimmer
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            string video = clips + "APEX2.mp4";
+            string video = clips + "APEX.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
@@ -89,9 +89,15 @@ namespace VGClipTrimmer
             */
             //lastTask.Wait();
 
-            List<TimeSpan> results = tuples.Where(result => result.Item2).Select(time => TimeSpan.FromSeconds(time.Item1)).ToList();
+            List<byte[]> images = FFmpeg.SnapshotsToList(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
 
-            var r = FFmpeg.SnapshotsToList(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString());
+            int maxDegreeOfParallelism = Environment.ProcessorCount;
+            Parallel.For(0, images.Count, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
+            {
+                tuples.Add(OCRImage(i, images[i]));
+            });
+
+            List<TimeSpan> results = tuples.Where(result => result.Item2).Select(time => TimeSpan.FromSeconds(time.Item1)).ToList();
 
             watch.Stop();
 
