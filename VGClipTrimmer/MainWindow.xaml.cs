@@ -31,8 +31,9 @@ namespace VGClipTrimmer
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            await Task.Run(() => TestBatch());
-            //ShutdownApp();
+            //await Task.Run(() => TestBatch());
+            var r = FFmpeg.CutVideo(clips + "APEX2.mp4", clips + "outAPEX2.mp4", new TimeSpan(0, 0, 55), new TimeSpan(0, 3, 55));
+            ShutdownApp();
         }
 
         private void TestBatch()
@@ -104,11 +105,19 @@ namespace VGClipTrimmer
 
         private string TestOCRImage(Bitmap image)
         {
-            return OCR(ResizeCleanImage(image));
+            return OCR(CropResizeCleanImage(image));
         }
 
         private Bitmap ResizeCleanImage(Bitmap image)
         {
+            image = ImageProcessing.ResizeImageSlow(image, 800, 158);
+            image = ImageProcessing.CleanImage(image);
+            return image;
+        }
+
+        private Bitmap CropResizeCleanImage(Bitmap image)
+        {
+            image = ImageProcessing.CropImage(image);
             image = ImageProcessing.ResizeImageSlow(image, 800, 158);
             image = ImageProcessing.CleanImage(image);
             return image;

@@ -12,13 +12,15 @@ namespace VGClipTrimmer.helpers
 
         public static Bitmap CropImage(Bitmap image)
         {
-            double widthMultiplier = 0.25;
-            double heightMultiplier = 0.10;
-            int width = (int)(image.Width * widthMultiplier);
-            int height = (int)(image.Height * heightMultiplier);
+            int ww = image.Width;
+            int hh = image.Height;
 
-            int startingPointX = (image.Width / 2) - (width / 2);
-            int startingPointY = (int)(image.Height * 0.75) - (height / 2);
+            double widthMultiplier = 0.25;
+            double heightMultiplier = 0.05;
+            int width = (int)(ww * widthMultiplier / 1.75);
+            int height = (int)(hh * heightMultiplier);
+            int startingPointX = (int)((ww / 2) - (width / 1.4));
+            int startingPointY = (int)((hh * 0.75) - (height / 0.9));
 
             Rectangle section = new Rectangle(new Point(startingPointX, startingPointY), new Size(width, height));
             Bitmap bitmap = new Bitmap(section.Width, section.Height);
