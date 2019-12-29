@@ -7,8 +7,21 @@ using System.IO;
 
 namespace VGClipTrimmer.helpers
 {
-    public class ImageProcessing
+    public class ImageEditing
     {
+        public static Bitmap CropImage(Bitmap image, int startingX, int startingY)
+        {
+            int width = image.Width / 2;
+            int height = image.Height / 2;
+
+            Rectangle section = new Rectangle(new Point(startingX, startingY), new Size(width, height));
+            Bitmap bitmap = new Bitmap(section.Width, section.Height);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.DrawImage(image, 0, 0, section, GraphicsUnit.Pixel);
+                return bitmap;
+            }
+        }
 
         public static Bitmap CropImage(Bitmap image)
         {

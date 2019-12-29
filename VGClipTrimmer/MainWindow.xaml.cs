@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Tesseract;
 using VGClipTrimmer.helpers;
+using VGClipTrimmer.Imaging;
 
 namespace VGClipTrimmer
 {
@@ -32,16 +33,106 @@ namespace VGClipTrimmer
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
             //await Task.Run(() => TestBatch());
-            var r = FFmpeg.CutVideo(clips + "APEX2.mp4", clips + "outAPEX2.mp4", new TimeSpan(0, 0, 55), new TimeSpan(0, 3, 55));
+            //var r = FFmpeg.CutVideo(clips + "APEX2.mp4", clips + "outAPEX2.mp4", new TimeSpan(0, 0, 55), new TimeSpan(0, 3, 55));
+            CreateImages();
             ShutdownApp();
+        }
+
+        private void CreateImages()
+        {
+            string video = clips + "APEX2.mp4";
+            string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+
+            int ww = int.Parse(lines.Where(x => x.Contains("width=")).FirstOrDefault().Split('=')[1]);
+            int hh = int.Parse(lines.Where(x => x.Contains("height=")).FirstOrDefault().Split('=')[1]);
+
+            string[] duration = lines.Where(x => x.Contains("duration=")).FirstOrDefault().Split('=')[1].Split('.')[0].Split(':');
+            int length = (int)new TimeSpan(int.Parse(duration[0]), int.Parse(duration[1]), int.Parse(duration[2])).TotalSeconds;
+
+            int frames = 3;
+            int fps = (int)Math.Round((double)length / frames);
+
+            List<List<Bitmap>> cropped = new List<List<Bitmap>>();
+
+            int ww2 = ww / 2;
+            int hh2 = hh / 2;
+
+            List<Tuple<int, int>> positions = new List<Tuple<int, int>>
+            {
+                new Tuple<int, int>(0, 0),
+                new Tuple<int, int>(ww2, 0),
+                new Tuple<int, int>(0, hh2),
+                new Tuple<int, int>(ww2, hh2)
+            };
+
+            for (int i = 0; i < frames; i++)
+            {
+                cropped.Add(new List<Bitmap>()); ;
+            }
+
+            int maxDegreeOfParallelism = Environment.ProcessorCount;
+            Parallel.For(0, frames, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
+            {
+                TimeSpan span = new TimeSpan(0, 0, fps * i);
+                Bitmap image = FFmpeg.Snapshot(span.ToString(), video);
+                for (int j = 0; j < 4; j++)
+                {
+                    cropped[i].Add(ImageEditing.CropImage(image, positions[j].Item1, positions[j].Item2));
+                }
+            });
+
+            List<Tuple<GameEnum, string>> uiImages = new List<Tuple<GameEnum, string>>();
+
+            uiImages.Add(new Tuple<GameEnum, string>(GameEnum.APEX, clips + "APEXUIGS.png"));
+            uiImages.Add(new Tuple<GameEnum, string>(GameEnum.PUBG, clips + "PUBGUIGS.png"));
+
+            List<Tuple<GameEnum, List<Bitmap>>> slicedUiImages = new List<Tuple<GameEnum, List<Bitmap>>>();
+
+            for (int i = 0; i < uiImages.Count; i++)
+            {
+                slicedUiImages.Add(new Tuple<GameEnum, List<Bitmap>>(uiImages[i].Item1, new List<Bitmap>()));
+                Bitmap image = (Bitmap)Image.FromFile(uiImages[i].Item2);
+                image = ImageEditing.ResizeImageSlow(image, ww, hh);
+                for (int j = 0; j < 4; j++)
+                {
+                    slicedUiImages[i].Item2.Add(ImageEditing.CropImage(image, positions[j].Item1, positions[j].Item2));
+                }
+            }
+
+            List<Tuple<GameEnum, List<float>>> comparsions = new List<Tuple<GameEnum, List<float>>>(); 
+
+            // games
+            for (int i = 0; i < slicedUiImages.Count; i++)
+            {
+                Tuple<GameEnum, List<Bitmap>> uiSlices = slicedUiImages[i];
+
+                List<float> values = new List<float>();
+
+                // frames
+                for (int j = 0; j < cropped.Count; j++)
+                {
+                    List<Bitmap> frameSlices = cropped[j];
+
+                    // slices
+                    for (int k = 0; k < 4; k++)
+                    {
+                        values.Add(100 - ImageComparsion.GetBhattacharyyaDifference(frameSlices[k], uiSlices.Item2[k]) * 100);
+                        SaveImage(frameSlices[k], "frame" + i.ToString() + j.ToString() + k.ToString());
+                        SaveImage(uiSlices.Item2[k], "ui" + i.ToString() + j.ToString() + k.ToString());
+                    }
+                }
+                comparsions.Add(new Tuple<GameEnum, List<float>>(slicedUiImages[i].Item1, values));
+            }
+
+            float avg1 = comparsions[0].Item2.Where(x => !float.IsNaN(x)).OrderByDescending(x => x).Take(3).Average();
+            float avg2 = comparsions[1].Item2.Where(x => !float.IsNaN(x)).OrderByDescending(x => x).Take(3).Average();
+
+            int xxx = 0;
         }
 
         private void TestBatch()
         {
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-
-            string video = clips + "APEX.mp4";
+            string video = clips + "APEX2.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
@@ -60,29 +151,15 @@ namespace VGClipTrimmer
 
             List<Tuple<int, bool>> tuples = new List<Tuple<int, bool>>();
 
-            EventHandler handler = new EventHandler((sender, e) =>
-            {
-                ImagesEventArgs args = e as ImagesEventArgs;
-                tuples.Add(OCRImage(args.Seconds, args.Image));
-            });
+            List<byte[]> images = FFmpeg.SnapshotEverySecond(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), 307200);
 
-            Stopwatch watch1 = new Stopwatch();
-            watch1.Start();
-            List<byte[]> images = FFmpeg.SnapshotsToList(video, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), 307200);
-            watch1.Stop();
-            Stopwatch watch2 = new Stopwatch();
-            watch2.Start();
             int maxDegreeOfParallelism = Environment.ProcessorCount;
             Parallel.For(0, images.Count, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
             {
                 tuples.Add(OCRImage(i, images[i]));
             });
-            watch2.Stop();
 
             List<TimeSpan> results = tuples.Where(result => result.Item2).Select(time => TimeSpan.FromSeconds(time.Item1)).ToList();
-
-            watch.Stop();
-            int xx = 0;
         }
 
         private Tuple<int, bool> OCRImage(int seconds, byte[] imageBytes)
@@ -105,21 +182,13 @@ namespace VGClipTrimmer
 
         private string TestOCRImage(Bitmap image)
         {
-            return OCR(CropResizeCleanImage(image));
+            return OCR(ResizeCleanImage(image));
         }
 
         private Bitmap ResizeCleanImage(Bitmap image)
         {
-            image = ImageProcessing.ResizeImageSlow(image, 800, 158);
-            image = ImageProcessing.CleanImage(image);
-            return image;
-        }
-
-        private Bitmap CropResizeCleanImage(Bitmap image)
-        {
-            image = ImageProcessing.CropImage(image);
-            image = ImageProcessing.ResizeImageSlow(image, 800, 158);
-            image = ImageProcessing.CleanImage(image);
+            image = ImageEditing.ResizeImageSlow(image, 800, 158);
+            image = ImageEditing.CleanImage(image);
             return image;
         }
 
@@ -137,18 +206,6 @@ namespace VGClipTrimmer
                 res = page.GetText();
             }
             return res;
-        }
-
-        private void SaveImage(Bitmap image)
-        {
-            Bitmap original = new Bitmap(image);
-            original.Save(clips + "output1.png");
-
-            Bitmap resized = new Bitmap(ImageProcessing.ResizeImageSlow(image, 800, 158));
-            resized.Save(clips + "output2.png");
-
-            Bitmap cleaned = new Bitmap(ResizeCleanImage(image));
-            cleaned.Save(clips + "output3.png");
         }
 
         private void SaveImage(Image image, string name)

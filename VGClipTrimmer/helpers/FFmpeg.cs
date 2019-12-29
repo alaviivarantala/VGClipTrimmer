@@ -34,20 +34,19 @@ namespace VGClipTrimmer.helpers
             return result;
         }
 
-        public static Bitmap Snapshot(string time, string video, string width, string height, string x, string y)
+        public static Bitmap Snapshot(string time, string video)
         {
             Bitmap bitmap = null;
 
             using (Process process = new Process())
             {
                 process.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
-                process.StartInfo.Arguments = "-ss " + time + " -i " + video + " -filter:v crop=" + width + ":" + height + ":" + x + ":" + y + " -vframes 1 -c:v png -f image2pipe -";
+                process.StartInfo.Arguments = "-ss " + time + " -i " + video + " -vframes 1 -vcodec png -f image2pipe -";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardError = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.Start();
-                process.BeginErrorReadLine();
 
                 bitmap = new Bitmap(process.StandardOutput.BaseStream);
 
@@ -57,11 +56,86 @@ namespace VGClipTrimmer.helpers
             return bitmap;
         }
 
-        public static List<byte[]> SnapshotsToList(string video, string width, string height, string x, string y, int readSize)
+        public static List<byte[]> SnapshotEverySecond(string video, string width, string height, string x, string y, int readSize)
         {
             Process proc = new Process();
             proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
             proc.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png -f image2pipe -";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+            proc.StartInfo.RedirectStandardError = false;
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.EnableRaisingEvents = true;
+            proc.Start();
+
+            List<byte[]> resultsList = new List<byte[]>();
+
+            using (BinaryReader reader = new BinaryReader(proc.StandardOutput.BaseStream))
+            {
+                byte[] readBytes = null;
+                byte[] stash = new byte[0];
+                byte[] image = new byte[0];
+                int frameCount = 0;
+
+                do
+                {
+                    readBytes = reader.ReadBytes(readSize);
+
+                    byte[] pattern = new byte[] { 73, 69, 78, 68, 174, 66, 96, 130 };
+                    int[] results = ByteProcessing.Locate(readBytes, pattern);
+
+                    for (int i = 0; i < results.Length; i++)
+                    {
+                        results[i] += pattern.Length;
+                    }
+
+                    if (results.Length == 0)
+                    {
+                        stash = stash.ToList().Concat(readBytes.ToList()).ToArray();
+                    }
+                    else if (results.Length == 1)
+                    {
+                        image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                        resultsList.Add(image);
+                        frameCount++;
+                        stash = readBytes.Skip(results[0]).ToArray();
+                    }
+                    else
+                    {
+                        for (int i = 0; i < results.Length; i++)
+                        {
+                            if (i == 0)
+                            {
+                                image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                                resultsList.Add(image);
+                                frameCount++;
+                            }
+                            else
+                            {
+                                image = readBytes.Skip(results[i - 1]).Take(results[i] - results[i - 1]).ToArray();
+                                resultsList.Add(image);
+                                frameCount++;
+
+                                if (i == results.Length - 1)
+                                {
+                                    stash = readBytes.Skip(results[i]).ToArray();
+                                }
+                            }
+                        }
+                    }
+                } while (readBytes.Length != 0);
+            }
+
+            proc.WaitForExit();
+
+            return resultsList;
+        }
+
+        public static List<byte[]> SnapshotsWithFPS(string video, int fps, int readSize)
+        {
+            Process proc = new Process();
+            proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+            proc.StartInfo.Arguments = "-i " + video + " -vf fps=1/" + fps + " -vcodec png -f image2pipe -";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardError = false;
@@ -139,7 +213,7 @@ namespace VGClipTrimmer.helpers
             using (Process process = new Process())
             {
                 process.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
-                process.StartInfo.Arguments = "-i " + inputVideo + " -ss " + from + " -t " + to + " -vcodec copy -acodec copy " + outputVideo;
+                process.StartInfo.Arguments = "-ss " + from + " -i " + inputVideo + " -t " + to + " -vcodec copy -acodec copy " + outputVideo;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.RedirectStandardError = true;
