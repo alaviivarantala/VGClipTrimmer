@@ -1,0 +1,16 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="StaticRectangleStyle" TargetType="{x:Type Rectangle}">
+        <Style.Setters>
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="RadiusX" Value="16" />
+            <Setter Property="RadiusY" Value="16" />
+            <Setter Property="Stroke" Value="{StaticResource SemiWhiteBrush}" />
+            <Setter Property="StrokeDashArray" Value="8 4" />
+            <Setter Property="StrokeThickness" Value="4" />
+            <Setter Property="Margin" Value="8" />
+        </Style.Setters>
+    </Style>
+    
+</ResourceDictionary>

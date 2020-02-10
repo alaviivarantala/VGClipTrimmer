@@ -4,13 +4,16 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows.Media.Imaging;
 
 namespace VGClipTrimmer.helpers
 {
     public class FFmpeg
     {
+        /// <summary>
+        /// Read a video file with ffprobe and return information
+        /// </summary>
+        /// <param name="video">File path to video file</param>
+        /// <returns></returns>
         public static string Info(string video)
         {
             string result = string.Empty;
@@ -34,14 +37,20 @@ namespace VGClipTrimmer.helpers
             return result;
         }
 
-        public static Bitmap Snapshot(string time, string video)
+        /// <summary>
+        /// Return single frame from a video at specific time point
+        /// </summary>
+        /// <param name="time">Time point in video</param>
+        /// <param name="video">File path to video file</param>
+        /// <returns></returns>
+        public static Bitmap Snapshot(TimeSpan time, string video)
         {
             Bitmap bitmap = null;
 
             using (Process process = new Process())
             {
                 process.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
-                process.StartInfo.Arguments = "-ss " + time + " -i " + video + " -vframes 1 -vcodec png -f image2pipe -";
+                process.StartInfo.Arguments = "-ss " + time.ToString() + " -i " + video + " -vframes 1 -vcodec png -f image2pipe -";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.RedirectStandardError = false;

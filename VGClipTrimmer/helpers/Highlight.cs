@@ -12,11 +12,9 @@ namespace VGClipTrimmer.helpers
         public TimeSpan From { get; set; }
         public TimeSpan To { get; set; }
 
-        public Highlight(int kills, TimeSpan from, TimeSpan to)
+        public Highlight()
         {
-            Kills = kills;
-            From = from;
-            To = to;
+
         }
     }
 }

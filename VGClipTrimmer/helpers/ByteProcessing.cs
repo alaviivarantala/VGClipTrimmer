@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace VGClipTrimmer.helpers
 {
+    // this class is used for ffmpeg pipe output processing
+    // the purpose of these methods is to locate a specific array of bytes in another byte array
     public class ByteProcessing
     {
         static readonly int[] Empty = new int[0];

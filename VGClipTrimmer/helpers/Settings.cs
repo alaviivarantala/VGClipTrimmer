@@ -8,11 +8,15 @@ namespace VGClipTrimmer.helpers
 {
     public class Settings
     {
-        public bool PlaceholderSetting { get; set; }
+        // dark or light
+        public bool Theme { get; set; }
 
-        public Settings(bool placeholderSetting)
+        // time to include before and after a highlight
+        public int GracePeriod { get; set; }
+
+        public Settings()
         {
-            PlaceholderSetting = placeholderSetting;
+
         }
     }
 }

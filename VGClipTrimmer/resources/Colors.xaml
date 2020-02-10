@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="PrimaBlue" A="255" B="175" G="124" R="0" />
+    <SolidColorBrush x:Key="PrimaBlueBrush" Color="{StaticResource PrimaBlue}" />
+    <Color x:Key="BluePressedColor" A="255" B="154" G="109" R="0" />
+    <SolidColorBrush x:Key="BluePressedBrush" Color="{StaticResource BluePressedColor}" />
+    <Color x:Key="WindowTopBarColor" A="255" B="45" G="45" R="45" />
+    <SolidColorBrush x:Key="WindowTopBarBrush" Color="{StaticResource WindowTopBarColor}" />
+</ResourceDictionary>
