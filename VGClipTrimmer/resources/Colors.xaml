@@ -1,10 +1,18 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <Color x:Key="HighlightColor" A="75" R="255" G="255" B="255" />
+    <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" />
+    
     <Color x:Key="PurpleFadeColor" A="255" R="181" G="10" B="177" />
     <SolidColorBrush x:Key="PurpleFadeBrush" Color="{StaticResource PurpleFadeColor}" />
 
     <Color x:Key="BlueFadeColor" A="255" R="14" G="100" B="225" />
     <SolidColorBrush x:Key="BlueFadeBrush" Color="{StaticResource BlueFadeColor}" />
+
+    <LinearGradientBrush x:Key="BluePurpleBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="Blue" Offset="1" />
+        <GradientStop Color="Purple" Offset="0" />
+    </LinearGradientBrush>
 
 </ResourceDictionary>
