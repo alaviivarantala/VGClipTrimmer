@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="/VGClipTrimmer;component\Resources\Colors.xaml" />
                 <ResourceDictionary Source="/VGClipTrimmer;component\Resources\Icons.xaml" />
                 <ResourceDictionary Source="/VGClipTrimmer;component\Resources\Styles.xaml" />
+                <ResourceDictionary Source="/VGClipTrimmer;component\Resources\Fonts.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

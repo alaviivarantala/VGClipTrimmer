@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace VGClipTrimmer.Framework
+namespace VGClipTrimmer.MVVM.Framework
 {
     abstract class Command : ICommand
     {

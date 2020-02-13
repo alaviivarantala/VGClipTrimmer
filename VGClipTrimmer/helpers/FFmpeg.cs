@@ -4,8 +4,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using VGClipTrimmer.Video.Processing;
 
-namespace VGClipTrimmer.helpers
+namespace VGClipTrimmer.Helpers
 {
     public class FFmpeg
     {
@@ -20,7 +21,7 @@ namespace VGClipTrimmer.helpers
 
             using (Process process = new Process())
             {
-                process.StartInfo.FileName = "./ffmpeg/ffprobe.exe";
+                process.StartInfo.FileName = "./video/ffmpeg/ffprobe.exe";
                 process.StartInfo.Arguments = "-hide_banner -show_format -show_streams -pretty " + video;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
@@ -49,7 +50,7 @@ namespace VGClipTrimmer.helpers
 
             using (Process process = new Process())
             {
-                process.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+                process.StartInfo.FileName = "./video/ffmpeg/ffmpeg.exe";
                 process.StartInfo.Arguments = "-ss " + time.ToString() + " -i " + video + " -vframes 1 -vcodec png -f image2pipe -";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
@@ -68,7 +69,7 @@ namespace VGClipTrimmer.helpers
         public static List<byte[]> SnapshotEverySecond(string video, string width, string height, string x, string y, int readSize)
         {
             Process proc = new Process();
-            proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+            proc.StartInfo.FileName = "./video/ffmpeg/ffmpeg.exe";
             proc.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png -f image2pipe -";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
@@ -143,7 +144,7 @@ namespace VGClipTrimmer.helpers
         public static List<byte[]> SnapshotsWithFPS(string video, int fps, int readSize)
         {
             Process proc = new Process();
-            proc.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+            proc.StartInfo.FileName = "./video/ffmpeg/ffmpeg.exe";
             proc.StartInfo.Arguments = "-i " + video + " -vf fps=1/" + fps + " -vcodec png -f image2pipe -";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
@@ -221,7 +222,7 @@ namespace VGClipTrimmer.helpers
 
             using (Process process = new Process())
             {
-                process.StartInfo.FileName = "./ffmpeg/ffmpeg.exe";
+                process.StartInfo.FileName = "./video/ffmpeg/ffmpeg.exe";
                 process.StartInfo.Arguments = "-ss " + from + " -i " + inputVideo + " -t " + to + " -vcodec copy -acodec copy " + outputVideo;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;

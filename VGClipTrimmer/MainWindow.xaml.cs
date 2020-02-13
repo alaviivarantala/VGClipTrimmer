@@ -1,7 +1,7 @@
 ﻿using AdonisUI;
 using AdonisUI.Controls;
-using System;
 using System.Windows;
+using VGClipTrimmer.MVVM.ViewModels;
 
 namespace VGClipTrimmer
 {
@@ -12,14 +12,15 @@ namespace VGClipTrimmer
     {
         public MainWindow()
         {
+            DataContext = new MainViewModel();
             InitializeComponent();
         }
 
         private bool _isDark;
+
         private void ChangeTheme(object sender, RoutedEventArgs e)
         {
             ResourceLocator.SetColorScheme(Application.Current.Resources, _isDark ? ResourceLocator.LightColorScheme : ResourceLocator.DarkColorScheme);
-
             _isDark = !_isDark;
         }
         private void ShutdownApp()

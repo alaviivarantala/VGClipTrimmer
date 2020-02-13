@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace VGClipTrimmer.helpers
+namespace VGClipTrimmer.Video.Processing
 {
     // this class is used for ffmpeg pipe output processing
     // the purpose of these methods is to locate a specific array of bytes in another byte array

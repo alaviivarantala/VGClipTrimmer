@@ -6,22 +6,24 @@
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
                              Title="Game Highlight Clipper - 0.0.1 alpha"
+                             FontFamily="Segoe UI"
+                             IconVisibility="Collapsed"
                              TitleBarBackground="{StaticResource BluePurpleBrush}"
                              WindowButtonHighlightBrush="{StaticResource HighlightBrush}">
-
-    <Window.Style>
-        <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}"/>
-    </Window.Style>
 
     <adonisControls:AdonisWindow.TitleBarContent>
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right">
-            <Button Content="🎺"
+            <Button Content="🎨"
                     Style="{DynamicResource {x:Static adonisUi:Styles.WindowButton}}"
-                    
                     FontFamily="Segoe UI"
                     FontSize="14"
-                    ToolTip="Send feedback"/>
+                    ToolTip="Toggle theme"/>
+            <Button Content="🇫🇮"
+                    Style="{DynamicResource {x:Static adonisUi:Styles.WindowButton}}"
+                    FontFamily="Segoe UI"
+                    FontSize="14"
+                    ToolTip="Toggle theme"/>
         </StackPanel>
     </adonisControls:AdonisWindow.TitleBarContent>
 
@@ -29,6 +31,7 @@
         <TextBox Text="Enter video file path..." Width="250" />
         <Button Content="📂" Width="35" Height="25" Margin="8 0"/>
         <Button Content="🔎" Width="35" Height="25" />
+        <Button Content="▶" Width="35" Height="25" Margin="8 0"/>
     </StackPanel>
     
 </adonisControls:AdonisWindow>

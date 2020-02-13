@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using Tesseract;
-using VGClipTrimmer.helpers;
-using VGClipTrimmer.Imaging;
+using VGClipTrimmer.Helpers;
+using VGClipTrimmer.Video.Processing;
 
 namespace VGClipTrimmer
 {
@@ -169,7 +169,7 @@ namespace VGClipTrimmer
         public static string OCR(Bitmap img)
         {
             string res = "";
-            using (var engine = new TesseractEngine(@"tessdata", "eng", EngineMode.Default))
+            using (var engine = new TesseractEngine(@"./video/tessdata", "eng", EngineMode.Default))
             {
                 // Whitelist of chars to recognize
                 engine.SetVariable("tessedit_char_whitelist", "ACDEIKLMNOTW");

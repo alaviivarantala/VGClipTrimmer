@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace VGClipTrimmer.Framework
+namespace VGClipTrimmer.MVVM.Framework
 {
     abstract class ViewModelCommand<TContextViewModel> : Command where TContextViewModel : ViewModel
     {

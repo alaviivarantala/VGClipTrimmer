@@ -2,7 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 
-namespace VGClipTrimmer.helpers
+namespace VGClipTrimmer.Helpers
 {
     public class General
     {

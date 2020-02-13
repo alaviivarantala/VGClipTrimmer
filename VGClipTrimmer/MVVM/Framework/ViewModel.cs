@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace VGClipTrimmer.Framework
+namespace VGClipTrimmer.MVVM.Framework
 {
-    class ViewModel : INotifyPropertyChanged, IDataErrorInfo
+    public class ViewModel : INotifyPropertyChanged, IDataErrorInfo
     {
         private readonly Dictionary<string, IList<string>> _validationErrors = new Dictionary<string, IList<string>>();
 

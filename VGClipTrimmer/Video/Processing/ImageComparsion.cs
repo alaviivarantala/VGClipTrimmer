@@ -7,7 +7,7 @@ using System.Drawing.Imaging;
 // Use, alter and redistribute this code freely,
 // but please leave this comment :)
 
-namespace VGClipTrimmer.Imaging
+namespace VGClipTrimmer.Video.Processing
 {
     public static class ImageComparsion
     {
