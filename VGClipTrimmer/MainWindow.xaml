@@ -3,7 +3,9 @@
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
-                             Title="Game Highlight Clipper - 0.0.1 alpha"
+                             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+                             xmlns:helpers="clr-namespace:VGClipTrimmer.Helpers"
+                             Title="{Binding WindowTitle}"
                              FontFamily="Segoe UI"
                              IconVisibility="Collapsed"
                              TitleBarBackground="{StaticResource VIFadeInverseBrush}"
@@ -26,12 +28,21 @@
                     Command="{Binding ToggleLanguageCommand}" />
         </StackPanel>
     </adonisControls:AdonisWindow.TitleBarContent>
-
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-        <TextBox Text="Enter video file path..." Width="250" IsReadOnly="True" />
-        <Button Content="📂" Width="35" Height="25" Margin="8 0" Command="{Binding OpenFileLocationCommand}" />
-        <Button Content="🔎" Width="35" Height="25" Command="{Binding BrowseForFilesCommand}" />
-        <Button Content="▶" Width="35" Height="25" Margin="8 0" Command="{Binding StartProcessingCommand}" />
-    </StackPanel>
     
+    <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal">
+            <TextBox Text="Enter video file path..." Width="250" IsReadOnly="True" />
+            <Button Content="📂" Width="35" Height="25" Margin="8 0" Command="{Binding OpenFileLocationCommand}" />
+            <Button Content="🔎" Width="35" Height="25" Command="{Binding BrowseForFilesCommand}" />
+            <Button Content="▶" Width="35" Height="25" Margin="8 0 0 0" Command="{Binding StartProcessingCommand}" />
+        </StackPanel>
+        <ProgressBar adonisExtensions:ProgressBarExtension.Content="{Binding ProgressBarText}"
+             Minimum="0"
+             Maximum="100"
+             Height="25"
+             Margin="0 4"
+             helpers:ProgressBarSmoother.SmoothValue="{Binding ProcessingProgress}"/>
+    </StackPanel>
+
+
 </adonisControls:AdonisWindow>

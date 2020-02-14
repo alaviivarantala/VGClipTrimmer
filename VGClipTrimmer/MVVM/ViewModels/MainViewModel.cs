@@ -1,8 +1,14 @@
 ﻿using AdonisUI;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using System;
 using System.Diagnostics;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using VGClipTrimmer.MVVM.Models.Interfaces;
+using VGClipTrimmer.MVVM.Models.Services;
 
 namespace VGClipTrimmer.MVVM.ViewModels
 {
@@ -11,18 +17,37 @@ namespace VGClipTrimmer.MVVM.ViewModels
         private bool _isEnglishLanguange = true;
         private bool _isDarkTheme = true;
 
+        private IVideoProcessingService _videoProcessingService;
+
+        private string _windowTitle;
+        public string WindowTitle
+        {
+            get => _windowTitle;
+            set => Set(ref _windowTitle, value);
+        }
         private string _languageSymbol = "🇪🇳";
         public string LanguageSymbol
         {
             get => _languageSymbol;
             set => Set(ref _languageSymbol, value);
         }
-
         private string _videoFile;
         public string VideoFile
         {
             get => _videoFile;
             set => Set(ref _videoFile, value);
+        }
+        private string _progressBarText;
+        public string ProgressBarText
+        {
+            get => _progressBarText;
+            set => Set(ref _progressBarText, value);
+        }
+        private int _processingProgress;
+        public int ProcessingProgress
+        {
+            get => _processingProgress;
+            set => Set(ref _processingProgress, value);
         }
 
         public RelayCommand ToggleLanguageCommand => new RelayCommand(ToggleLanguageAction);
@@ -35,14 +60,12 @@ namespace VGClipTrimmer.MVVM.ViewModels
         private void ToggleThemeAction() => ToggleTheme();
         private void OpenFileLocationAction() => Process.Start("explorer.exe", "/select, \"" + VideoFile + "\"");
         private void BrowseForFilesAction() => VideoFile = Helpers.General.SelectVideoFile();
-        private void StartProcessingAction()
-        {
-
-        }
+        private void StartProcessingAction() => ProcessVideo();
 
         public MainViewModel()
         {
-
+            _videoProcessingService = new VideoProcessingService();
+            WindowTitle = "Game Highlight Clipper - " + Assembly.GetExecutingAssembly().GetName().Version;
         }
 
         private void ToggleLanguage()
@@ -55,6 +78,16 @@ namespace VGClipTrimmer.MVVM.ViewModels
         {
             ResourceLocator.SetColorScheme(Application.Current.Resources, _isDarkTheme ? ResourceLocator.LightColorScheme : ResourceLocator.DarkColorScheme);
             _isDarkTheme = !_isDarkTheme;
+        }
+
+        private async void ProcessVideo()
+        {
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+            CancellationToken cancelToken = tokenSource.Token;
+
+            IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
+
+            await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
         }
     }
 }

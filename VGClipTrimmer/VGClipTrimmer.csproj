@@ -97,6 +97,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\ProgressBarSmoother.cs" />
+    <Compile Include="MVVM\Models\Interfaces\IVideoProcessingService.cs" />
+    <Compile Include="MVVM\Models\Services\VideoProcessingService.cs" />
     <Compile Include="MVVM\ViewModels\MainViewModel.cs" />
     <Compile Include="Helpers\TestingMethods.cs" />
     <Page Include="MainWindow.xaml">
@@ -206,7 +209,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MVVM\Commands\" />
-    <Folder Include="MVVM\Models\" />
     <Folder Include="MVVM\Views\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
