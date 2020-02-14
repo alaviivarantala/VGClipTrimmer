@@ -15,4 +15,18 @@
         <GradientStop Color="Purple" Offset="0" />
     </LinearGradientBrush>
 
+    <Color x:Key="PinkVIFade">#E43C67</Color>
+    <Color x:Key="PurpleVIFade">#9E47C3</Color>
+    <Color x:Key="BlueVIFade">#455CD5</Color>
+    <Color x:Key="CyanVIFade">#337FC5</Color>
+    <Color x:Key="GreenVIFade">#3FC57D</Color>
+
+    <LinearGradientBrush x:Key="VIFadeBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{StaticResource GreenVIFade}" Offset="0" />
+        <GradientStop Color="{StaticResource CyanVIFade}" Offset="0.25" />
+        <GradientStop Color="{StaticResource BlueVIFade}" Offset="0.5" />
+        <GradientStop Color="{StaticResource PurpleVIFade}" Offset="0.75" />
+        <GradientStop Color="{StaticResource PinkVIFade}" Offset="1" />
+    </LinearGradientBrush>
+
 </ResourceDictionary>
