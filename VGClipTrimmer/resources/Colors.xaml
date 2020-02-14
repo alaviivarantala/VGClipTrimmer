@@ -29,4 +29,12 @@
         <GradientStop Color="{StaticResource PinkVIFade}" Offset="1" />
     </LinearGradientBrush>
 
+    <LinearGradientBrush x:Key="VIFadeInverseBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{StaticResource GreenVIFade}" Offset="1" />
+        <GradientStop Color="{StaticResource CyanVIFade}" Offset="0.75" />
+        <GradientStop Color="{StaticResource BlueVIFade}" Offset="0.5" />
+        <GradientStop Color="{StaticResource PurpleVIFade}" Offset="0.25" />
+        <GradientStop Color="{StaticResource PinkVIFade}" Offset="0" />
+    </LinearGradientBrush>
+
 </ResourceDictionary>

@@ -1,14 +1,12 @@
 ﻿<adonisControls:AdonisWindow x:Class="VGClipTrimmer.MainWindow"
                              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
                              Title="Game Highlight Clipper - 0.0.1 alpha"
                              FontFamily="Segoe UI"
                              IconVisibility="Collapsed"
-                             TitleBarBackground="{StaticResource VIFadeBrush}"
+                             TitleBarBackground="{StaticResource VIFadeInverseBrush}"
                              WindowButtonHighlightBrush="{StaticResource HighlightBrush}">
 
     <adonisControls:AdonisWindow.TitleBarContent>
@@ -18,20 +16,22 @@
                     Style="{DynamicResource {x:Static adonisUi:Styles.WindowButton}}"
                     FontFamily="Segoe UI"
                     FontSize="14"
-                    ToolTip="Toggle theme"/>
-            <Button Content="🇫🇮"
+                    ToolTip="Toggle theme" 
+                    Command="{Binding ToggleThemeCommand}" />
+            <Button Content="{Binding LanguageSymbol}"
                     Style="{DynamicResource {x:Static adonisUi:Styles.WindowButton}}"
                     FontFamily="Segoe UI"
                     FontSize="14"
-                    ToolTip="Toggle theme"/>
+                    ToolTip="Toggle language"
+                    Command="{Binding ToggleLanguageCommand}" />
         </StackPanel>
     </adonisControls:AdonisWindow.TitleBarContent>
 
     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-        <TextBox Text="Enter video file path..." Width="250" />
-        <Button Content="📂" Width="35" Height="25" Margin="8 0"/>
-        <Button Content="🔎" Width="35" Height="25" />
-        <Button Content="▶" Width="35" Height="25" Margin="8 0"/>
+        <TextBox Text="Enter video file path..." Width="250" IsReadOnly="True" />
+        <Button Content="📂" Width="35" Height="25" Margin="8 0" Command="{Binding OpenFileLocationCommand}" />
+        <Button Content="🔎" Width="35" Height="25" Command="{Binding BrowseForFilesCommand}" />
+        <Button Content="▶" Width="35" Height="25" Margin="8 0" Command="{Binding StartProcessingCommand}" />
     </StackPanel>
     
 </adonisControls:AdonisWindow>

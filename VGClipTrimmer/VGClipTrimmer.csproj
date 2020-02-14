@@ -97,11 +97,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MVVM\Framework\Command.cs" />
-    <Compile Include="MVVM\Framework\ViewModel.cs" />
-    <Compile Include="MVVM\Framework\ViewModelCommand.cs" />
     <Compile Include="MVVM\ViewModels\MainViewModel.cs" />
-    <Compile Include="TestingMethods.cs" />
+    <Compile Include="Helpers\TestingMethods.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

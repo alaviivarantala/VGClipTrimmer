@@ -8,10 +8,19 @@ using Tesseract;
 using VGClipTrimmer.Helpers;
 using VGClipTrimmer.Video.Processing;
 
-namespace VGClipTrimmer
+namespace VGClipTrimmer.Helpers
 {
     public static class TestingMethods
     {
+
+        public static void PHM()
+        {
+            string clips = "C:/clips/";
+            //await Task.Run(() => TestBatch());
+            //var r = FFmpeg.CutVideo(clips + "APEX2.mp4", clips + "outAPEX2.mp4", new TimeSpan(0, 0, 55), new TimeSpan(0, 3, 55));
+            TestingMethods.CreateImages(clips);
+            General.ShutdownApp();
+        }
 
         public static void CreateImages(string clips)
         {
