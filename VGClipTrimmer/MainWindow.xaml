@@ -42,6 +42,12 @@
              Height="25"
              Margin="0 4"
              helpers:ProgressBarSmoother.SmoothValue="{Binding ProcessingProgress}"/>
+        <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}"
+                Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                Width="24"
+                Height="24"
+                Focusable="False"/>
+
     </StackPanel>
 
 

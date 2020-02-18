@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
@@ -83,12 +84,18 @@ namespace VGClipTrimmer.MVVM.ViewModels
 
         private async void ProcessVideo()
         {
-            VideoFileInfo videoFileInfo = _videoProcessingService.GetVideoFileInfo(VideoFile);
+            await Task.Delay(1000);
+            //VideoFileInfo videoFileInfo = await _videoProcessingService.GetVideoFileInfo(VideoFile);
 
+            List<Task<VideoFileInfo>> taskList = new List<Task<VideoFileInfo>>();
+            taskList.Add(Task.Run(() => _videoProcessingService.GetVideoFileInfo(VideoFile)));
+            await Task.WhenAll(taskList);
+            VideoFileInfo videoFileInfo = taskList[0].Result;
+            await Task.Delay(1000);
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancelToken = tokenSource.Token;
             IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
-            await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
+            await _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken);
         }
     }
 }
