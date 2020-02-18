@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using VGClipTrimmer.Helpers;
 using VGClipTrimmer.MVVM.Models.Interfaces;
 using VGClipTrimmer.MVVM.Models.Services;
 
@@ -59,7 +60,7 @@ namespace VGClipTrimmer.MVVM.ViewModels
         private void ToggleLanguageAction() => ToggleLanguage();
         private void ToggleThemeAction() => ToggleTheme();
         private void OpenFileLocationAction() => Process.Start("explorer.exe", "/select, \"" + VideoFile + "\"");
-        private void BrowseForFilesAction() => VideoFile = Helpers.General.SelectVideoFile();
+        private void BrowseForFilesAction() => VideoFile = General.SelectVideoFile();
         private void StartProcessingAction() => ProcessVideo();
 
         public MainViewModel()
@@ -82,11 +83,11 @@ namespace VGClipTrimmer.MVVM.ViewModels
 
         private async void ProcessVideo()
         {
+            VideoFileInfo videoFileInfo = _videoProcessingService.GetVideoFileInfo(VideoFile);
+
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancelToken = tokenSource.Token;
-
             IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
-
             await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
         }
     }

@@ -31,7 +31,7 @@
     
     <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Center">
         <StackPanel Orientation="Horizontal">
-            <TextBox Text="Enter video file path..." Width="250" IsReadOnly="True" />
+            <TextBox Text="{Binding VideoFile}" Width="250" IsReadOnly="True" />
             <Button Content="📂" Width="35" Height="25" Margin="8 0" Command="{Binding OpenFileLocationCommand}" />
             <Button Content="🔎" Width="35" Height="25" Command="{Binding BrowseForFilesCommand}" />
             <Button Content="▶" Width="35" Height="25" Margin="8 0 0 0" Command="{Binding StartProcessingCommand}" />
