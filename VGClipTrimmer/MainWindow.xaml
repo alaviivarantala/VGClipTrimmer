@@ -28,7 +28,39 @@
                     Command="{Binding ToggleLanguageCommand}" />
         </StackPanel>
     </adonisControls:AdonisWindow.TitleBarContent>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="5*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Click to browse for files" Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentForegroundBrush}}"/>
+                <ContentControl Margin="0 0 0 0" Width="75" Height="90" Content="{StaticResource DragDropIcon}" IsHitTestVisible="False"/>
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="Drag and drop files here" />
+            <Rectangle Grid.Column="0" Fill="Transparent" StrokeThickness="4" Stroke="{StaticResource VIFadeBrush}" RadiusX="16" RadiusY="16"/>
+            <Rectangle Grid.Column="1" Fill="Transparent" StrokeThickness="4" Stroke="{StaticResource VIFadeInverseBrush}" RadiusX="16" RadiusY="16"/>
+            
+        </Grid>
+
+    </Grid>
     
+    
+<!--
     <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Center">
         <StackPanel Orientation="Horizontal">
             <TextBox Text="{Binding VideoFile}" Width="250" IsReadOnly="True" />
@@ -49,6 +81,6 @@
                 Focusable="False"/>
 
     </StackPanel>
-
+-->
 
 </adonisControls:AdonisWindow>
