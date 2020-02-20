@@ -4,12 +4,15 @@
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
                              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+                             xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
+                             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                              xmlns:helpers="clr-namespace:VGClipTrimmer.Helpers"
                              Title="{Binding WindowTitle}"
                              FontFamily="Segoe UI"
                              IconVisibility="Collapsed"
                              TitleBarBackground="{StaticResource VIFadeInverseBrush}"
-                             WindowButtonHighlightBrush="{StaticResource HighlightBrush}">
+                             WindowButtonHighlightBrush="{StaticResource HighlightBrush}"
+                             Width="1280" Height="720" MinWidth="640" MinHeight="360">
 
     <adonisControls:AdonisWindow.TitleBarContent>
         <StackPanel Orientation="Horizontal"
@@ -29,36 +32,80 @@
         </StackPanel>
     </adonisControls:AdonisWindow.TitleBarContent>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="5*" />
-            <ColumnDefinition Width="3*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="5*" />
-            <RowDefinition Height="3*" />
-            <RowDefinition Height="5*" />
-        </Grid.RowDefinitions>
+    <Grid AllowDrop="True" Background="Transparent">
+        <!--Event handlers for dragging and dropping-->
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="PreviewDragEnter">
+                <mvvm:EventToCommand Command="{Binding PreviewDragEnterCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+            </i:EventTrigger>
+            <i:EventTrigger EventName="PreviewDragLeave">
+                <mvvm:EventToCommand Command="{Binding PreviewDragLeaveCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+            </i:EventTrigger>
+            <i:EventTrigger EventName="PreviewDrop">
+                <mvvm:EventToCommand Command="{Binding PreviewDropCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
 
-        <Grid Grid.Row="1" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <!--Grid contains the first start view-->
+        <Grid>
 
-            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="Click to browse for files" Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentForegroundBrush}}"/>
-                <ContentControl Margin="0 0 0 0" Width="75" Height="90" Content="{StaticResource DragDropIcon}" IsHitTestVisible="False"/>
-            </StackPanel>
-            <TextBlock Grid.Column="1" Text="Drag and drop files here" />
-            <Rectangle Grid.Column="0" Fill="Transparent" StrokeThickness="4" Stroke="{StaticResource VIFadeBrush}" RadiusX="16" RadiusY="16"/>
-            <Rectangle Grid.Column="1" Fill="Transparent" StrokeThickness="4" Stroke="{StaticResource VIFadeInverseBrush}" RadiusX="16" RadiusY="16"/>
-            
+            <Grid Height="320" Width="630" Style="{StaticResource GridMouseOverHandStyle}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <mvvm:EventToCommand Command="{Binding BrowseForFilesCommand, Mode=OneWay}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" >
+                    <ContentControl Margin="0 16" Width="50" Height="80" Content="{StaticResource MouseIcon}" IsHitTestVisible="False" HorizontalAlignment="Center"/>
+                    <TextBlock FontSize="14" Text="Click to browse for files" HorizontalAlignment="Center"/>
+                    <TextBlock Margin="0 8" FontSize="14" Text="—— or ——" HorizontalAlignment="Center"/>
+                    <TextBlock FontSize="14" Text="Drag and drop files here" HorizontalAlignment="Center"/>
+                    <ContentControl Margin="0 16" Width="70" Height="80" Content="{StaticResource DownloadIcon}" IsHitTestVisible="False" HorizontalAlignment="Center"/>
+                </StackPanel>
+                <Rectangle Fill="Transparent" StrokeThickness="4" Stroke="{StaticResource VIFadeInverseBrush}" RadiusX="16" RadiusY="16" Style="{StaticResource RectangleGradientHighlightStyle}"/>
+            </Grid>
+
+
+            <!--Grid faded in when dragging and dropping-->
+            <Grid Opacity="0" IsHitTestVisible="{Binding DisplayDropZone}">
+                <Grid.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DisplayDropZone}" Value="True" >
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="0.75" Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+
+                <ContentControl Content="{StaticResource DownloadIcon}" Width="175" Height="225" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"/>
+
+                <Rectangle Margin="8" IsHitTestVisible="False" RadiusX="16" RadiusY="16" Stroke="{StaticResource DarkGrayBrush}" StrokeDashArray="8 4" StrokeThickness="4"/>
+
+            </Grid>
+
+
         </Grid>
+        
 
     </Grid>
-    
     
 <!--
     <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Center">
