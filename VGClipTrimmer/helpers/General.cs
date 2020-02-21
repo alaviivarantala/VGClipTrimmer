@@ -20,19 +20,19 @@ namespace VGClipTrimmer.Helpers
             }
         }
 
-        public static string SelectVideoFile()
+        public static string[] SelectVideoFiles()
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Multiselect = false;
+            ofd.Multiselect = true;
             ofd.Filter = "Video files (*.mp4, *.avi, *.flv)|*.mp4;*.avi;*.flv";
             bool? result = ofd.ShowDialog();
 
             if (result == true && result.HasValue)
             {
-                return ofd.FileName;
+                return ofd.FileNames;
             }
 
-            return string.Empty;
+            return new string[] { string.Empty };
         }
 
         public static void ShutdownApp()

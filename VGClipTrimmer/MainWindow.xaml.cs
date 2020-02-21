@@ -12,7 +12,7 @@ namespace VGClipTrimmer
     {
         public MainWindow()
         {
-            DataContext = new MainViewModel();
+            DataContext = new MainWindowViewModel();
             InitializeComponent();
         }
     }
