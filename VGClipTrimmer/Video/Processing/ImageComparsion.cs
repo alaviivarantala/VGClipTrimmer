@@ -48,8 +48,9 @@ namespace VGClipTrimmer.Video.Processing
             return difference;
         }
         */
-        //the colormatrix needed to grayscale an image
-        //http://www.switchonthecode.com/tutorials/csharp-tutorial-convert-a-color-image-to-grayscale
+
+        // the colormatrix needed to grayscale an image
+        // http://www.switchonthecode.com/tutorials/csharp-tutorial-convert-a-color-image-to-grayscale
         private static readonly ColorMatrix ColorMatrix = new ColorMatrix(new float[][]
         {
             new float[] {.3f, .3f, .3f, 0, 0},
@@ -160,21 +161,21 @@ namespace VGClipTrimmer.Video.Processing
 
         private static Image GetGrayScaleVersion(this Image original)
         {
-            //http://www.switchonthecode.com/tutorials/csharp-tutorial-convert-a-color-image-to-grayscale
-            //create a blank bitmap the same size as original
+            // http://www.switchonthecode.com/tutorials/csharp-tutorial-convert-a-color-image-to-grayscale
+            // create a blank bitmap the same size as original
             Bitmap newBitmap = new Bitmap(original.Width, original.Height);
 
-            //get a graphics object from the new image
+            // get a graphics object from the new image
             using (Graphics g = Graphics.FromImage(newBitmap))
             {
-                //create some image attributes
+                // create some image attributes
                 ImageAttributes attributes = new ImageAttributes();
 
-                //set the color matrix attribute
+                // set the color matrix attribute
                 attributes.SetColorMatrix(ColorMatrix);
 
-                //draw the original image on the new image
-                //using the grayscale color matrix
+                // draw the original image on the new image
+                // using the grayscale color matrix
                 g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
                    0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
             }

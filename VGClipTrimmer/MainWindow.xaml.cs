@@ -1,6 +1,4 @@
-﻿using AdonisUI;
-using AdonisUI.Controls;
-using System.Windows;
+﻿using AdonisUI.Controls;
 using VGClipTrimmer.MVVM.ViewModels;
 
 namespace VGClipTrimmer
