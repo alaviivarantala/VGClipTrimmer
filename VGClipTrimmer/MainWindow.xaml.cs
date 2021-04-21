@@ -1,4 +1,5 @@
 ﻿using AdonisUI.Controls;
+using VGClipTrimmer.Helpers;
 using VGClipTrimmer.MVVM.ViewModels;
 
 namespace VGClipTrimmer
@@ -10,8 +11,8 @@ namespace VGClipTrimmer
     {
         public MainWindow()
         {
-            DataContext = new MainWindowViewModel();
             InitializeComponent();
+            TestingMethods.PHM();
         }
     }
 }

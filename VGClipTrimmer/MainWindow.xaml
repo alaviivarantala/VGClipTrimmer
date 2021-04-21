@@ -3,18 +3,21 @@
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
-                             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
                              xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
                              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-                             xmlns:helpers="clr-namespace:VGClipTrimmer.Helpers"
                              xmlns:converters="clr-namespace:VGClipTrimmer.Converters"
                              xmlns:views="clr-namespace:VGClipTrimmer.MVVM.Views"
+                             xmlns:viewModels="clr-namespace:VGClipTrimmer.MVVM.ViewModels"
                              Title="{Binding WindowTitle}"
                              FontFamily="Segoe UI"
                              IconVisibility="Collapsed"
                              TitleBarBackground="{StaticResource VIFadeInverseBrush}"
                              WindowButtonHighlightBrush="{StaticResource HighlightBrush}"
                              Width="1280" Height="720" MinWidth="640" MinHeight="360">
+
+    <Window.DataContext>
+        <viewModels:MainWindowViewModel />
+    </Window.DataContext>
 
     <Window.Resources>
         <converters:InvertBoolConverter x:Key="InvertBool"/>

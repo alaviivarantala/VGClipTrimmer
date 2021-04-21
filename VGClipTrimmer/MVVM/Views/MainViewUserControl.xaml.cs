@@ -10,7 +10,6 @@ namespace VGClipTrimmer.MVVM.Views
     {
         public MainViewUserControl()
         {
-            DataContext = new MainViewViewModel();
             InitializeComponent();
         }
     }

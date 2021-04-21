@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using Tesseract;
-using VGClipTrimmer.Helpers;
 using VGClipTrimmer.Video.Processing;
 
 namespace VGClipTrimmer.Helpers
@@ -13,12 +12,12 @@ namespace VGClipTrimmer.Helpers
     public static class TestingMethods
     {
 
-        public static void PHM()
+        public static async void PHM()
         {
             string clips = "C:/clips/";
-            //await Task.Run(() => TestBatch());
+            await Task.Run(() => TestBatch(clips));
             //var r = FFmpeg.CutVideo(clips + "APEX2.mp4", clips + "outAPEX2.mp4", new TimeSpan(0, 0, 55), new TimeSpan(0, 3, 55));
-            TestingMethods.CreateImages(clips);
+            //TestingMethods.CreateImages(clips);
             General.ShutdownApp();
         }
 
@@ -115,7 +114,7 @@ namespace VGClipTrimmer.Helpers
 
         public static void TestBatch(string clips)
         {
-            string video = clips + "APEX2.mp4";
+            string video = clips + "APEX3.mp4";
 
             string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
