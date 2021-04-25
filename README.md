@@ -1,2 +1,2 @@
-# VGClipTrimmer
- Automated game video clip trimming.
+# Game-Highlight-Clipper
+ Automated game video highlight clipping.
