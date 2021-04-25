@@ -1,13 +1,13 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models.Interfaces;
 using GameHighlightClipper.MVVM.Models.Services;
+using GameHighlightClipper.MVVM.Models;
+using System;
 
 namespace GameHighlightClipper.MVVM.ViewModels
 {
@@ -15,12 +15,13 @@ namespace GameHighlightClipper.MVVM.ViewModels
     {
         private IVideoProcessingService _videoProcessingService;
 
-        private string _videoFile;
-        public string VideoFile
+        private List<VideoFile> _videoFiles;
+        public List<VideoFile> VideoFiles
         {
-            get => _videoFile;
-            set => Set(ref _videoFile, value);
+            get => _videoFiles;
+            set => Set(ref _videoFiles, value);
         }
+        /*
         private string _progressBarText;
         public string ProgressBarText
         {
@@ -33,7 +34,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             get => _processingProgress;
             set => Set(ref _processingProgress, value);
         }
-
+        */
         #region Commands
 
         public RelayCommand BrowseForFilesCommand => new RelayCommand(BrowseForFilesAction);
@@ -59,19 +60,40 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         private void BrowseForFiles()
         {
-            VideoFile = General.SelectVideoFiles()[0];
+            try
+            {
+                string[] videoFilePaths = FileTools.SelectVideoFiles();
+
+                foreach (string videoFilePath in videoFilePaths)
+                {
+                    if (!string.IsNullOrWhiteSpace(videoFilePath))
+                    {
+                        VideoFile videoFile = new VideoFile
+                        {
+                            FilePath = videoFilePath,
+                            FileSize = FileTools.GetFileSize(videoFilePath)
+                        };
+                        VideoFiles.Add(videoFile);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                NLogLogger.LogError(ex, "MainViewViewModel; BrowseForFiles");
+            }
         }
 
         private void OpenFileLocation()
         {
-            Process.Start("explorer.exe", "/select, \"" + VideoFile + "\"");
+            int index = 0;
+            Process.Start("explorer.exe", "/select, \"" + VideoFiles[index].FilePath + "\"");
         }
 
         private async void ProcessVideo()
         {
             await Task.Delay(1000);
             //VideoFileInfo videoFileInfo = await _videoProcessingService.GetVideoFileInfo(VideoFile);
-
+            /*
             List<Task<VideoFileInfo>> taskList = new List<Task<VideoFileInfo>>();
             taskList.Add(Task.Run(() => _videoProcessingService.GetVideoFileInfo(VideoFile)));
             await Task.WhenAll(taskList);
@@ -81,6 +103,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             CancellationToken cancelToken = tokenSource.Token;
             IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
             await _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken);
+            */
         }
 
 

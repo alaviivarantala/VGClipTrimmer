@@ -1,6 +1,12 @@
 ﻿using AdonisUI;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using GameHighlightClipper.Helpers;
+using GameHighlightClipper.MVVM.Models;
+using GameHighlightClipper.MVVM.Models.Interfaces;
+using GameHighlightClipper.MVVM.Models.Services;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -8,6 +14,8 @@ namespace GameHighlightClipper.MVVM.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        private IVideoProcessingService _videoProcessingService;
+
         private bool _isEnglishLanguange = true;
         private bool _isDarkTheme = true;
 
@@ -16,6 +24,13 @@ namespace GameHighlightClipper.MVVM.ViewModels
         {
             get => _displayDropZone;
             set => Set(ref _displayDropZone, value);
+        }
+
+        private bool _validPreviewFiles = false;
+        public bool ValidPreviewFiles
+        {
+            get => _validPreviewFiles;
+            set => Set(ref _validPreviewFiles, value);
         }
         private string _windowTitle;
         public string WindowTitle
@@ -28,6 +43,13 @@ namespace GameHighlightClipper.MVVM.ViewModels
         {
             get => _languageSymbol;
             set => Set(ref _languageSymbol, value);
+        }
+
+        private string _dragDropInfo = string.Empty;
+        public string DragDropInfo
+        {
+            get => _dragDropInfo;
+            set => Set(ref _dragDropInfo, value);
         }
 
         #region Commands
@@ -54,6 +76,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         public MainWindowViewModel()
         {
+            _videoProcessingService = new VideoProcessingService();
             WindowTitle = "Game Highlight Clipper - " + Assembly.GetExecutingAssembly().GetName().Version;
         }
 
@@ -61,6 +84,34 @@ namespace GameHighlightClipper.MVVM.ViewModels
         {
             DisplayDropZone = true;
             e.Handled = true;
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] paths = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                List<long> fileSizes = new List<long>();
+
+                foreach (string path in paths)
+                {
+                    if (FileTools.IsVideoFile(path))
+                    {
+                        fileSizes.Add(FileTools.GetFileSize(path));
+                    }
+                }
+
+                if (fileSizes.Count > 0)
+                {
+                    long totalByteCount = fileSizes.Sum();
+                    string formattedSize = FileTools.FormatFileSize(totalByteCount);
+                    DragDropInfo = fileSizes.Count + " valid file(s), total size: " + formattedSize;
+                    ValidPreviewFiles = true;
+                }
+                else
+                {
+                    DragDropInfo = "No valid files.";
+                    ValidPreviewFiles = false;
+                }
+            }
         }
 
         private void PreviewDragLeave(DragEventArgs e)

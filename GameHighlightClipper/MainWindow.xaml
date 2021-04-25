@@ -21,6 +21,8 @@
 
     <Window.Resources>
         <converters:InvertBoolConverter x:Key="InvertBool"/>
+        <converters:BooleanToVisibilityConverter True="Visible" False="Collapsed" x:Key="BoolToVis" />
+        <converters:BooleanToVisibilityConverter True="Collapsed" False="Visible" x:Key="BoolToVisInv" />
     </Window.Resources>
 
     <adonisControls:AdonisWindow.TitleBarContent>
@@ -115,7 +117,8 @@
                 </Style>
             </Grid.Style>
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
-                <ContentControl Content="{StaticResource DownloadIcon}" Width="175" Height="225" />
+                <ContentControl Foreground="Green" Content="{StaticResource DownloadIcon}" Width="175" Height="225" Visibility="{Binding ValidPreviewFiles, Converter={StaticResource BoolToVis}}"/>
+                <ContentControl Foreground="Red" Content="{StaticResource CrossIcon}" Width="225" Height="225" Visibility="{Binding ValidPreviewFiles, Converter={StaticResource BoolToVisInv}}"/>
                 <TextBlock Text="{Binding DragDropInfo}" HorizontalAlignment="Center" Margin="20" FontSize="36" />
             </StackPanel>
             <Rectangle Margin="8" IsHitTestVisible="False" RadiusX="16" RadiusY="16" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" StrokeDashArray="8 4" StrokeThickness="4"/>

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using Tesseract;
 using GameHighlightClipper.Video.Processing;
+using GameHighlightClipper.MVVM.Models;
 
 namespace GameHighlightClipper.Helpers
 {
@@ -18,7 +19,7 @@ namespace GameHighlightClipper.Helpers
             await Task.Run(() => TestBatch(clips));
             //var r = FFmpeg.CutVideo(clips + "APEX2.mp4", clips + "outAPEX2.mp4", new TimeSpan(0, 0, 55), new TimeSpan(0, 3, 55));
             //TestingMethods.CreateImages(clips);
-            General.ShutdownApp();
+            Utilities.ShutdownApp();
         }
 
         public static void CreateImages(string clips)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,9 +10,14 @@ namespace GameHighlightClipper.MVVM.Models.Services
 {
     public class VideoProcessingService : IVideoProcessingService
     {
-        public VideoFileInfo GetVideoFileInfo(string pathToVideo)
+        public VideoFile GetVideoFileInfo(string pathToVideo)
         {
-            VideoFileInfo videoFile = new VideoFileInfo();
+            VideoFile videoFile = new VideoFile
+            {
+                FilePath = pathToVideo,
+                FileSize = FileTools.GetFileSize(pathToVideo),
+                MD5Sum = FileTools.CalculateMD5(pathToVideo)
+            };
 
             // ffmpeg probe output in one string
             string ffmpegProbeOut = FFmpeg.Info(pathToVideo);
