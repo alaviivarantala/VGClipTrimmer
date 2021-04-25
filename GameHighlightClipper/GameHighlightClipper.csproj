@@ -118,11 +118,11 @@
     </Compile>
     <Compile Include="Video\Processing\ByteProcessing.cs" />
     <Compile Include="Helpers\FFmpeg.cs" />
-    <Compile Include="Helpers\GameEnum.cs" />
+    <Compile Include="MVVM\Models\GameEnum.cs" />
     <Compile Include="Helpers\General.cs" />
-    <Compile Include="Helpers\Highlight.cs" />
-    <Compile Include="Helpers\Settings.cs" />
-    <Compile Include="Helpers\VideoFileInfo.cs" />
+    <Compile Include="MVVM\Models\Highlight.cs" />
+    <Compile Include="MVVM\Models\Settings.cs" />
+    <Compile Include="MVVM\Models\VideoFileInfo.cs" />
     <Compile Include="Helpers\XMLHelper.cs" />
     <Compile Include="Video\Processing\ImageEditing.cs" />
     <Compile Include="Video\Processing\ImageComparsion.cs" />

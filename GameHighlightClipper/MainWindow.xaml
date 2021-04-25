@@ -114,7 +114,10 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <ContentControl Content="{StaticResource DownloadIcon}" Width="175" Height="225" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"/>
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
+                <ContentControl Content="{StaticResource DownloadIcon}" Width="175" Height="225" />
+                <TextBlock Text="{Binding DragDropInfo}" HorizontalAlignment="Center" Margin="20" FontSize="36" />
+            </StackPanel>
             <Rectangle Margin="8" IsHitTestVisible="False" RadiusX="16" RadiusY="16" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" StrokeDashArray="8 4" StrokeThickness="4"/>
         </Grid>
     </Grid>

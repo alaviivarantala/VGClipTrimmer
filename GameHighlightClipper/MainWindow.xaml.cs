@@ -1,6 +1,4 @@
 ﻿using AdonisUI.Controls;
-using GameHighlightClipper.Helpers;
-using GameHighlightClipper.MVVM.ViewModels;
 
 namespace GameHighlightClipper
 {
@@ -12,7 +10,6 @@ namespace GameHighlightClipper
         public MainWindow()
         {
             InitializeComponent();
-            TestingMethods.PHM();
         }
     }
 }
