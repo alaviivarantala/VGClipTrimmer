@@ -1,5 +1,4 @@
 ﻿using System.Windows.Controls;
-using GameHighlightClipper.MVVM.ViewModels;
 
 namespace GameHighlightClipper.MVVM.Views
 {

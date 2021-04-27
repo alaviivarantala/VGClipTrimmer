@@ -5,14 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:views="clr-namespace:GameHighlightClipper.MVVM.Views"
              xmlns:viewModels="clr-namespace:GameHighlightClipper.MVVM.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-
-    <UserControl.DataContext>
-        <viewModels:MainViewViewModel />
-    </UserControl.DataContext>
-
+             d:DesignHeight="450" d:DesignWidth="800"
+             DataContext="{Binding Source={StaticResource Locator}, Path=MainView}">
+<!--
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type viewModels:VideoFileViewModel}">
+            <views:VideoFileUserControl />
+        </DataTemplate>
+    </UserControl.Resources>
+-->
     <Grid>
         <!--Displayed when no video files have been added-->
         <Grid Opacity="1">
@@ -35,31 +39,14 @@
 
         <!--Shown when there's atleast one video file given-->
         <Grid Opacity="0">
-            
+            <!--
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                <ItemsControl Padding="64" ItemsSource="{Binding VideoFiles}"/>
+            </ScrollViewer>
+            -->
         </Grid>
         
     </Grid>
 
 </UserControl>
 
-<!--
-    <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Center">
-        <StackPanel Orientation="Horizontal">
-            <TextBox Text="{Binding VideoFile}" Width="250" IsReadOnly="True" />
-            <Button Content="📂" Width="35" Height="25" Margin="8 0" Command="{Binding OpenFileLocationCommand}" />
-            <Button Content="🔎" Width="35" Height="25" Command="{Binding BrowseForFilesCommand}" />
-            <Button Content="▶" Width="35" Height="25" Margin="8 0 0 0" Command="{Binding StartProcessingCommand}" />
-        </StackPanel>
-        <ProgressBar adonisExtensions:ProgressBarExtension.Content="{Binding ProgressBarText}"
-             Minimum="0"
-             Maximum="100"
-             Height="25"
-             Margin="0 4"
-             helpers:ProgressBarSmoother.SmoothValue="{Binding ProcessingProgress}"/>
-        <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}"
-                Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
-                Width="24"
-                Height="24"
-                Focusable="False"/>
-    </StackPanel>
--->

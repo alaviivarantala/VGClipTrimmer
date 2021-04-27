@@ -4,23 +4,22 @@ namespace GameHighlightClipper.MVVM.Models.Interfaces
 {
     public interface INLogLogger
     {
-        void Debug(Exception exception);
-        void Debug(string format, params object[] args);
-        void Debug(Exception exception, string format, params object[] args);
-        void Error(Exception exception);
-        void Error(string format, params object[] args);
-        void Error(Exception exception, string format, params object[] args);
-        void Fatal(Exception exception);
-        void Fatal(string format, params object[] args);
-        void Fatal(Exception exception, string format, params object[] args);
-        void Info(Exception exception);
-        void Info(string format, params object[] args);
-        void Info(Exception exception, string format, params object[] args);
-        void Trace(Exception exception);
-        void Trace(string format, params object[] args);
-        void Trace(Exception exception, string format, params object[] args);
-        void Warn(Exception exception);
-        void Warn(string format, params object[] args);
-        void Warn(Exception exception, string format, params object[] args);
+        void LogDebug(string message);
+        void LogInfo(string message);
+        void LogError(string message);
+        void LogWarn(string message);
+        void LogTrace(string message);
+
+        void LogDebug(Exception exception, string message);
+        void LogInfo(Exception exception, string message);
+        void LogError(Exception exception, string message);
+        void LogWarn(Exception exception, string message);
+        void LogTrace(Exception exception, string message);
+
+        void LogDebug(Exception exception);
+        void LogInfo(Exception exception);
+        void LogError(Exception exception);
+        void LogWarn(Exception exception);
+        void LogTrace(Exception exception);
     }
 }

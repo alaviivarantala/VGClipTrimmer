@@ -7,17 +7,13 @@
                              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                              xmlns:converters="clr-namespace:GameHighlightClipper.Converters"
                              xmlns:views="clr-namespace:GameHighlightClipper.MVVM.Views"
-                             xmlns:viewModels="clr-namespace:GameHighlightClipper.MVVM.ViewModels"
                              Title="{Binding WindowTitle}"
                              FontFamily="Segoe UI"
                              IconVisibility="Collapsed"
                              TitleBarBackground="{StaticResource VIFadeInverseBrush}"
                              WindowButtonHighlightBrush="{StaticResource HighlightBrush}"
-                             Width="1280" Height="720" MinWidth="640" MinHeight="360">
-
-    <Window.DataContext>
-        <viewModels:MainWindowViewModel />
-    </Window.DataContext>
+                             Width="1280" Height="720" MinWidth="640" MinHeight="360"
+                             DataContext="{Binding Source={StaticResource Locator}, Path=MainWindow}">
 
     <Window.Resources>
         <converters:InvertBoolConverter x:Key="InvertBool"/>

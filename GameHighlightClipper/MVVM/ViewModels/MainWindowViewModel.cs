@@ -3,7 +3,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models.Interfaces;
-using GameHighlightClipper.MVVM.Models.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,8 +10,9 @@ using System.Windows;
 
 namespace GameHighlightClipper.MVVM.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase 
     {
+        private INLogLogger _nLogLogger;
         private IVideoProcessingService _videoProcessingService;
 
         private bool _isEnglishLanguange = true;
@@ -73,9 +73,10 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         #endregion
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(INLogLogger nLogLogger, IVideoProcessingService videoProcessingService)
         {
-            _videoProcessingService = new VideoProcessingService();
+            _nLogLogger = nLogLogger;
+            _videoProcessingService = videoProcessingService;
             WindowTitle = "Game Highlight Clipper - " + Assembly.GetExecutingAssembly().GetName().Version;
         }
 

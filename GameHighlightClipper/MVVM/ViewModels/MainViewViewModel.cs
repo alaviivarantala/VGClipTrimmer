@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models.Interfaces;
-using GameHighlightClipper.MVVM.Models.Services;
 using GameHighlightClipper.MVVM.Models;
 using System;
 
@@ -13,6 +12,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
 {
     public class MainViewViewModel : ViewModelBase
     {
+        private INLogLogger _nLogLogger;
         private IVideoProcessingService _videoProcessingService;
 
         private List<VideoFile> _videoFiles;
@@ -21,20 +21,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             get => _videoFiles;
             set => Set(ref _videoFiles, value);
         }
-        /*
-        private string _progressBarText;
-        public string ProgressBarText
-        {
-            get => _progressBarText;
-            set => Set(ref _progressBarText, value);
-        }
-        private int _processingProgress;
-        public int ProcessingProgress
-        {
-            get => _processingProgress;
-            set => Set(ref _processingProgress, value);
-        }
-        */
+
         #region Commands
 
         public RelayCommand BrowseForFilesCommand => new RelayCommand(BrowseForFilesAction);
@@ -53,9 +40,10 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         #endregion
 
-        public MainViewViewModel()
+        public MainViewViewModel(INLogLogger nLogLogger, IVideoProcessingService videoProcessingService)
         {
-            _videoProcessingService = new VideoProcessingService();
+            _nLogLogger = nLogLogger;
+            _videoProcessingService = videoProcessingService;
         }
 
         private void BrowseForFiles()
@@ -79,7 +67,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             }
             catch (Exception ex)
             {
-                NLogLogger.LogError(ex, "MainViewViewModel; BrowseForFiles");
+                _nLogLogger.LogError(ex, "MainViewViewModel; BrowseForFiles");
             }
         }
 

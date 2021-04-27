@@ -4,119 +4,76 @@ using System;
 
 namespace GameHighlightClipper.MVVM.Models.Services
 {
-    public class NLogLogger : Logger, INLogLogger
+    public class NLogLogger : INLogLogger
     {
-        private const string _loggerName = "NLogLogger";
-
-        public static INLogLogger GetLoggingService()
+        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        public void LogDebug(string message)
         {
-            INLogLogger logger = (INLogLogger)LogManager.GetLogger("NLogLogger", typeof(NLogLogger));
-            return logger;
+            logger.Debug(message);
+        }
+        public void LogInfo(string message)
+        {
+            logger.Info(message);
+        }
+        public void LogError(string message)
+        {
+            logger.Error(message);
+        }
+        public void LogWarn(string message)
+        {
+            logger.Warn(message);
+        }
+        public void LogTrace(string message)
+        {
+            logger.Trace(message);
         }
 
-        public void Debug(Exception exception, string format, params object[] args)
+        public void LogDebug(Exception exception, string message)
         {
-            if (!base.IsDebugEnabled) return;
-            var logEvent = GetLogEvent(_loggerName, LogLevel.Debug, exception, format, args);
-            base.Log(typeof(NLogLogger), logEvent);
+            logger.Debug(exception, message);
         }
 
-        public void Error(Exception exception, string format, params object[] args)
+        public void LogInfo(Exception exception, string message)
         {
-            if (!base.IsErrorEnabled) return;
-            var logEvent = GetLogEvent(_loggerName, LogLevel.Error, exception, format, args);
-            base.Log(typeof(NLogLogger), logEvent);
+            logger.Info(exception, message);
         }
 
-        public void Fatal(Exception exception, string format, params object[] args)
+        public void LogError(Exception exception, string message)
         {
-            if (!base.IsFatalEnabled) return;
-            var logEvent = GetLogEvent(_loggerName, LogLevel.Fatal, exception, format, args);
-            base.Log(typeof(NLogLogger), logEvent);
+            logger.Error(exception, message);
         }
 
-        public void Info(Exception exception, string format, params object[] args)
+        public void LogWarn(Exception exception, string message)
         {
-            if (!base.IsInfoEnabled) return;
-            var logEvent = GetLogEvent(_loggerName, LogLevel.Info, exception, format, args);
-            base.Log(typeof(NLogLogger), logEvent);
+            logger.Warn(exception, message);
+        }
+        public void LogTrace(Exception exception, string message)
+        {
+            logger.Trace(exception, message);
         }
 
-        public void Trace(Exception exception, string format, params object[] args)
+        public void LogDebug(Exception exception)
         {
-            if (!base.IsTraceEnabled) return;
-            var logEvent = GetLogEvent(_loggerName, LogLevel.Trace, exception, format, args);
-            base.Log(typeof(NLogLogger), logEvent);
+            logger.Debug(exception);
         }
 
-        public void Warn(Exception exception, string format, params object[] args)
+        public void LogInfo(Exception exception)
         {
-            if (!base.IsWarnEnabled) return;
-            var logEvent = GetLogEvent(_loggerName, LogLevel.Warn, exception, format, args);
-            base.Log(typeof(NLogLogger), logEvent);
+            logger.Info(exception);
         }
 
-        public void Debug(Exception exception)
+        public void LogError(Exception exception)
         {
-            this.Debug(exception, string.Empty);
+            logger.Error(exception);
         }
 
-        public void Error(Exception exception)
+        public void LogWarn(Exception exception)
         {
-            this.Error(exception, string.Empty);
+            logger.Warn(exception);
         }
-
-        public void Fatal(Exception exception)
+        public void LogTrace(Exception exception)
         {
-            this.Fatal(exception, string.Empty);
-        }
-
-        public void Info(Exception exception)
-        {
-            this.Info(exception, string.Empty);
-        }
-
-        public void Trace(Exception exception)
-        {
-            this.Trace(exception, string.Empty);
-        }
-
-        public void Warn(Exception exception)
-        {
-            this.Warn(exception, string.Empty);
-        }
-
-        private LogEventInfo GetLogEvent(string loggerName, LogLevel level, Exception exception, string format, object[] args)
-        {
-            string assemblyProp = string.Empty;
-            string classProp = string.Empty;
-            string methodProp = string.Empty;
-            string messageProp = string.Empty;
-            string innerMessageProp = string.Empty;
-
-            var logEvent = new LogEventInfo
-                (level, loggerName, string.Format(format, args));
-
-            if (exception != null)
-            {
-                assemblyProp = exception.Source;
-                classProp = exception.TargetSite.DeclaringType.FullName;
-                methodProp = exception.TargetSite.Name;
-                messageProp = exception.Message;
-
-                if (exception.InnerException != null)
-                {
-                    innerMessageProp = exception.InnerException.Message;
-                }
-            }
-
-            logEvent.Properties["error-source"] = assemblyProp;
-            logEvent.Properties["error-class"] = classProp;
-            logEvent.Properties["error-method"] = methodProp;
-            logEvent.Properties["error-message"] = messageProp;
-            logEvent.Properties["inner-error-message"] = innerMessageProp;
-
-            return logEvent;
+            logger.Trace(exception);
         }
     }
 }
