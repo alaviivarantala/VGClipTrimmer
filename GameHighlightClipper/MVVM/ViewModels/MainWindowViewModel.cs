@@ -2,7 +2,6 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GameHighlightClipper.Helpers;
-using GameHighlightClipper.MVVM.Models;
 using GameHighlightClipper.MVVM.Models.Interfaces;
 using GameHighlightClipper.MVVM.Models.Services;
 using System.Collections.Generic;
@@ -129,8 +128,8 @@ namespace GameHighlightClipper.MVVM.ViewModels
                 //ParseFiles(paths);
 
                 DisplayDropZone = false;
-                //CommandManager.InvalidateRequerySuggested();
                 e.Handled = true;
+                //CommandManager.InvalidateRequerySuggested();
             }
         }
 
