@@ -7,22 +7,27 @@ namespace GameHighlightClipper.MVVM.Models.Services
     public class NLogLogger : INLogLogger
     {
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
         public void LogDebug(string message)
         {
             logger.Debug(message);
         }
+
         public void LogInfo(string message)
         {
             logger.Info(message);
         }
+
         public void LogError(string message)
         {
             logger.Error(message);
         }
+
         public void LogWarn(string message)
         {
             logger.Warn(message);
         }
+
         public void LogTrace(string message)
         {
             logger.Trace(message);
@@ -47,6 +52,7 @@ namespace GameHighlightClipper.MVVM.Models.Services
         {
             logger.Warn(exception, message);
         }
+
         public void LogTrace(Exception exception, string message)
         {
             logger.Trace(exception, message);
@@ -71,6 +77,7 @@ namespace GameHighlightClipper.MVVM.Models.Services
         {
             logger.Warn(exception);
         }
+
         public void LogTrace(Exception exception)
         {
             logger.Trace(exception);

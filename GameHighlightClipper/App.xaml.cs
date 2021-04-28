@@ -9,7 +9,7 @@ namespace GameHighlightClipper
     /// </summary>
     public partial class App : Application
     {
-        INLogLogger logger;
+        private INLogLogger logger;
 
         public App()
         {
@@ -17,7 +17,7 @@ namespace GameHighlightClipper
             currentDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
         }
 
-        void ExceptionHandler(object sender, UnhandledExceptionEventArgs args)
+        private void ExceptionHandler(object sender, UnhandledExceptionEventArgs args)
         {
             Exception e = (Exception)args.ExceptionObject;
             logger.LogTrace(e);

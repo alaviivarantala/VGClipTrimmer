@@ -7,6 +7,7 @@ namespace GameHighlightClipper.MVVM.Models.Interfaces
     public interface IVideoProcessingService
     {
         VideoFile GetVideoFileInfo(string pathToVideo);
+
         Task<object> ProcessVideoFile(string pathToVideo, IProgress<int> progress, CancellationToken token);
     }
 }

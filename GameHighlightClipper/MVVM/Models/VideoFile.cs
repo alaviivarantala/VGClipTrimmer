@@ -3,6 +3,7 @@
     public class VideoFile
     {
         public string MD5Sum { get; set; }
+        public string FileName { get; set; }
         public string FilePath { get; set; }
         public long FileSize { get; set; }
         public int Width { get; set; }

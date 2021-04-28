@@ -9,18 +9,23 @@ namespace GameHighlightClipper.MVVM.ViewModels
         private INLogLogger _nLogLogger;
 
         private VideoFile _videoFile;
+
         public VideoFile VideoFile
         {
             get => _videoFile;
             set => Set(ref _videoFile, value);
         }
+
         private string _progressBarText;
+
         public string ProgressBarText
         {
             get => _progressBarText;
             set => Set(ref _progressBarText, value);
         }
+
         private int _processingProgress;
+
         public int ProcessingProgress
         {
             get => _processingProgress;

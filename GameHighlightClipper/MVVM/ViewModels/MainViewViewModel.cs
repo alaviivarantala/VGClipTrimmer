@@ -16,6 +16,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
         private IVideoProcessingService _videoProcessingService;
 
         private List<VideoFile> _videoFiles;
+
         public List<VideoFile> VideoFiles
         {
             get => _videoFiles;
@@ -34,11 +35,12 @@ namespace GameHighlightClipper.MVVM.ViewModels
         private void BrowseForFilesAction() => BrowseForFiles();
 
         private void OpenFileLocationAction() => OpenFileLocation();
+
         private void StartProcessingAction() => ProcessVideo();
 
-        #endregion
+        #endregion Actions
 
-        #endregion
+        #endregion Commands
 
         public MainViewViewModel(INLogLogger nLogLogger, IVideoProcessingService videoProcessingService)
         {
@@ -93,7 +95,5 @@ namespace GameHighlightClipper.MVVM.ViewModels
             await _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken);
             */
         }
-
-
     }
 }

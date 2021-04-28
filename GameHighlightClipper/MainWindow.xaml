@@ -16,7 +16,7 @@
                              DataContext="{Binding Source={StaticResource Locator}, Path=MainWindow}">
 
     <Window.Resources>
-        <converters:InvertBoolConverter x:Key="InvertBool"/>
+        <converters:InvertBoolConverter x:Key="InvertBool" />
         <converters:BooleanToVisibilityConverter True="Visible" False="Collapsed" x:Key="BoolToVis" />
         <converters:BooleanToVisibilityConverter True="Collapsed" False="Visible" x:Key="BoolToVisInv" />
     </Window.Resources>
@@ -28,7 +28,7 @@
                     Style="{DynamicResource {x:Static adonisUi:Styles.WindowButton}}"
                     FontFamily="Segoe UI"
                     FontSize="14"
-                    ToolTip="Toggle theme" 
+                    ToolTip="Toggle theme"
                     Command="{Binding ToggleThemeCommand}" />
             <Button Content="{Binding LanguageSymbol}"
                     Style="{DynamicResource {x:Static adonisUi:Styles.WindowButton}}"
@@ -43,13 +43,13 @@
         <!--Event handlers for dragging and dropping-->
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="PreviewDragEnter">
-                <mvvm:EventToCommand Command="{Binding PreviewDragEnterCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+                <mvvm:EventToCommand Command="{Binding PreviewDragEnterCommand, Mode=OneWay}" PassEventArgsToCommand="True" />
             </i:EventTrigger>
             <i:EventTrigger EventName="PreviewDragLeave">
-                <mvvm:EventToCommand Command="{Binding PreviewDragLeaveCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+                <mvvm:EventToCommand Command="{Binding PreviewDragLeaveCommand, Mode=OneWay}" PassEventArgsToCommand="True" />
             </i:EventTrigger>
             <i:EventTrigger EventName="PreviewDrop">
-                <mvvm:EventToCommand Command="{Binding PreviewDropCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+                <mvvm:EventToCommand Command="{Binding PreviewDropCommand, Mode=OneWay}" PassEventArgsToCommand="True" />
             </i:EventTrigger>
         </i:Interaction.Triggers>
 
@@ -58,13 +58,13 @@
             <Grid.Style>
                 <Style>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding DisplayDropZone}" Value="True" >
+                        <DataTrigger Binding="{Binding DisplayDropZone}" Value="True">
                             <DataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.3">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
+                                                <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>
@@ -73,7 +73,7 @@
                             <DataTrigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3"/>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </DataTrigger.ExitActions>
@@ -89,13 +89,13 @@
             <Grid.Style>
                 <Style>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding DisplayDropZone}" Value="True" >
+                        <DataTrigger Binding="{Binding DisplayDropZone}" Value="True">
                             <DataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
+                                                <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>
@@ -104,7 +104,7 @@
                             <DataTrigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </DataTrigger.ExitActions>
@@ -113,11 +113,11 @@
                 </Style>
             </Grid.Style>
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
-                <ContentControl Foreground="Green" Content="{StaticResource DownloadIcon}" Width="175" Height="225" Visibility="{Binding ValidPreviewFiles, Converter={StaticResource BoolToVis}}"/>
-                <ContentControl Foreground="Red" Content="{StaticResource CrossIcon}" Width="225" Height="225" Visibility="{Binding ValidPreviewFiles, Converter={StaticResource BoolToVisInv}}"/>
+                <ContentControl Foreground="Green" Content="{StaticResource DownloadIcon}" Width="175" Height="225" Visibility="{Binding ValidPreviewFiles, Converter={StaticResource BoolToVis}}" />
+                <ContentControl Foreground="Red" Content="{StaticResource CrossIcon}" Width="225" Height="225" Visibility="{Binding ValidPreviewFiles, Converter={StaticResource BoolToVisInv}}" />
                 <TextBlock Text="{Binding DragDropInfo}" HorizontalAlignment="Center" Margin="20" FontSize="36" />
             </StackPanel>
-            <Rectangle Margin="8" IsHitTestVisible="False" RadiusX="16" RadiusY="16" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" StrokeDashArray="8 4" StrokeThickness="4"/>
+            <Rectangle Margin="8" IsHitTestVisible="False" RadiusX="16" RadiusY="16" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" StrokeDashArray="8 4" StrokeThickness="4" />
         </Grid>
     </Grid>
 </adonisControls:AdonisWindow>

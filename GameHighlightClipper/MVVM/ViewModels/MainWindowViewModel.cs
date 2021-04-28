@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace GameHighlightClipper.MVVM.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase 
+    public class MainWindowViewModel : ViewModelBase
     {
         private INLogLogger _nLogLogger;
         private IVideoProcessingService _videoProcessingService;
@@ -19,6 +19,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
         private bool _isDarkTheme = true;
 
         private bool _displayDropZone = false;
+
         public bool DisplayDropZone
         {
             get => _displayDropZone;
@@ -26,18 +27,23 @@ namespace GameHighlightClipper.MVVM.ViewModels
         }
 
         private bool _validPreviewFiles = false;
+
         public bool ValidPreviewFiles
         {
             get => _validPreviewFiles;
             set => Set(ref _validPreviewFiles, value);
         }
+
         private string _windowTitle;
+
         public string WindowTitle
         {
             get => _windowTitle;
             set => Set(ref _windowTitle, value);
         }
+
         private string _languageSymbol = "🇪🇳";
+
         public string LanguageSymbol
         {
             get => _languageSymbol;
@@ -45,6 +51,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
         }
 
         private string _dragDropInfo = string.Empty;
+
         public string DragDropInfo
         {
             get => _dragDropInfo;
@@ -63,15 +70,18 @@ namespace GameHighlightClipper.MVVM.ViewModels
         #region Actions
 
         private void PreviewDragEnterAction(DragEventArgs e) => PreviewDragEnter(e);
+
         private void PreviewDragLeaveAction(DragEventArgs e) => PreviewDragLeave(e);
+
         private void PreviewDropAction(DragEventArgs e) => PreviewDrop(e);
 
         private void ToggleLanguageAction() => ToggleLanguage();
+
         private void ToggleThemeAction() => ToggleTheme();
 
-        #endregion
+        #endregion Actions
 
-        #endregion
+        #endregion Commands
 
         public MainWindowViewModel(INLogLogger nLogLogger, IVideoProcessingService videoProcessingService)
         {

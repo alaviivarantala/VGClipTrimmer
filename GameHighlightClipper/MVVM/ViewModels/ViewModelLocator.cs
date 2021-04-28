@@ -19,6 +19,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
         {
             get { return _container.Resolve<MainViewViewModel>(); }
         }
+
         public MainWindowViewModel MainWindow
         {
             get { return _container.Resolve<MainWindowViewModel>(); }

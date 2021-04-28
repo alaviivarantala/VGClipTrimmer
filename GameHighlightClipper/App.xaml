@@ -5,10 +5,10 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <viewModel:ViewModelLocator x:Key="Locator"/>
+            <viewModel:ViewModelLocator x:Key="Locator" />
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/Dark.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/Dark.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
                 <ResourceDictionary Source="/GameHighlightClipper;component\Resources\Colors.xaml" />
                 <ResourceDictionary Source="/GameHighlightClipper;component\Resources\Icons.xaml" />
                 <ResourceDictionary Source="/GameHighlightClipper;component\Resources\Styles.xaml" />
