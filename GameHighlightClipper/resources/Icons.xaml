@@ -7,7 +7,7 @@
           Data="M 337.89258 427.76953 L 337.89258 507.60352 L 389.5625 507.60352 L 398.33594 533.07031 L 406.73438 520.96875 L 423.83594 537.26953 L 433.53516 527.36914 L 418.53516 510.26953 L 429.33594 502.07031 L 405.17969 493.60938 L 405.17969 452.43359 L 382.51562 427.76953 L 337.89258 427.76953 z M 342.25781 432.13477 L 377.71875 432.13477 L 377.71875 457.32227 L 400.81445 457.32227 L 400.81445 492.08008 L 381.93555 485.46875 L 388.05859 503.23828 L 342.25781 503.23828 L 342.25781 432.13477 z M 381.99219 432.75 L 400.19922 452.95703 L 381.99219 452.95703 L 381.99219 432.75 z M 387.03516 490.46875 L 421.83594 502.57031 L 412.53516 508.96875 L 428.86719 527.36719 L 424.17578 531.97852 L 405.33594 515.46875 L 399.03516 525.07031 L 387.03516 490.46875 z"
           Fill="{DynamicResource {x:Static adonisUi:Brushes.AccentForegroundBrush}}"
           Stretch="Fill" />
-    
+
     <Path x:Key="OpenFolderIcon"
           x:Shared="False"
           Data="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z"
@@ -33,4 +33,33 @@
           Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContentControl}}, Path=Foreground}"
           Stretch="Fill" />
 
+    <Path x:Key="FilesIcon"
+          x:Shared="False"
+          Data="M15,7H20.5L15,1.5V7M8,0H16L22,6V18A2,2 0 0,1 20,20H8C6.89,20 6,19.1 6,18V2A2,2 0 0,1 8,0M4,4V22H20V24H4A2,2 0 0,1 2,22V4H4Z"
+          Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContentControl}}, Path=Foreground}"
+          Stretch="Fill" />
+
+    <Path x:Key="FileIcon"
+          x:Shared="False"
+          Data="M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z"
+          Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContentControl}}, Path=Foreground}"
+          Stretch="Fill" />
+
+    <Path x:Key="FolderIcon"
+          x:Shared="False"
+          Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z"
+          Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContentControl}}, Path=Foreground}"
+          Stretch="Fill" />
+
+    <Path x:Key="FoldersIcon"
+          x:Shared="False"
+          Data="M22,4H14L12,2H6A2,2 0 0,0 4,4V16A2,2 0 0,0 6,18H22A2,2 0 0,0 24,16V6A2,2 0 0,0 22,4M2,6H0V11H0V20A2,2 0 0,0 2,22H20V20H2V6Z"
+          Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContentControl}}, Path=Foreground}"
+          Stretch="Fill" />
+
+    <Path x:Key="FileAlertIcon"
+          x:Shared="False"
+          Data="M22,4H14L12,2H6A2,2 0 0,0 4,4V16A2,2 0 0,0 6,18H22A2,2 0 0,0 24,16V6A2,2 0 0,0 22,4M2,6H0V11H0V20A2,2 0 0,0 2,22H20V20H2V6Z"
+          Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContentControl}}, Path=Foreground}"
+          Stretch="Fill" />
 </ResourceDictionary>

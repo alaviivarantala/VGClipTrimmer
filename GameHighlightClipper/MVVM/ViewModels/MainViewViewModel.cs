@@ -1,12 +1,12 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models.Interfaces;
 using GameHighlightClipper.MVVM.Models;
 using System;
+using System.Collections.ObjectModel;
 
 namespace GameHighlightClipper.MVVM.ViewModels
 {
@@ -15,9 +15,9 @@ namespace GameHighlightClipper.MVVM.ViewModels
         private INLogLogger _nLogLogger;
         private IVideoProcessingService _videoProcessingService;
 
-        private List<VideoFile> _videoFiles;
+        private ObservableCollection<VideoFile> _videoFiles;
 
-        public List<VideoFile> VideoFiles
+        public ObservableCollection<VideoFile> VideoFiles
         {
             get => _videoFiles;
             set => Set(ref _videoFiles, value);

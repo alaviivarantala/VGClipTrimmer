@@ -45,9 +45,22 @@ namespace GameHighlightClipper.Helpers
             return mediaExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
         }
 
+        public static bool FolderContainsVideoFiles(string path)
+        {
+            var files = Directory.EnumerateFiles(path, ".", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                if (IsVideoFile(file))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static long GetFileSize(string path)
         {
-            return new FileInfo(path).Length; 
+            return new FileInfo(path).Length;
         }
 
         public static string FormatFileSize(long byteCount)

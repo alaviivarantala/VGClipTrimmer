@@ -3,7 +3,9 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -24,14 +26,6 @@ namespace GameHighlightClipper.MVVM.ViewModels
         {
             get => _displayDropZone;
             set => Set(ref _displayDropZone, value);
-        }
-
-        private bool _validPreviewFiles = false;
-
-        public bool ValidPreviewFiles
-        {
-            get => _validPreviewFiles;
-            set => Set(ref _validPreviewFiles, value);
         }
 
         private string _windowTitle;
@@ -56,6 +50,14 @@ namespace GameHighlightClipper.MVVM.ViewModels
         {
             get => _dragDropInfo;
             set => Set(ref _dragDropInfo, value);
+        }
+
+        private DragDropType _dragDropType;
+
+        public DragDropType DragDropType
+        {
+            get => _dragDropType;
+            set => Set(ref _dragDropType, value);
         }
 
         #region Commands
@@ -99,27 +101,61 @@ namespace GameHighlightClipper.MVVM.ViewModels
             {
                 string[] paths = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                List<long> fileSizes = new List<long>();
+                List<Tuple<DragDropType, long>> typesSizesList = new List<Tuple<DragDropType, long>>();
 
                 foreach (string path in paths)
                 {
-                    if (FileTools.IsVideoFile(path))
+                    // is directory
+                    if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
                     {
-                        fileSizes.Add(FileTools.GetFileSize(path));
+                        var files = Directory.EnumerateFiles(path, ".", SearchOption.AllDirectories);
+                        foreach (var file in files)
+                        {
+                            if (FileTools.IsVideoFile(file))
+                            {
+                                typesSizesList.Add(new Tuple<DragDropType, long>(DragDropType.Folder, FileTools.GetFileSize(file)));
+                            }
+                        }
+                    }
+                    // is file
+                    else
+                    {
+                        if (FileTools.IsVideoFile(path))
+                        {
+                            typesSizesList.Add(new Tuple<DragDropType, long>(DragDropType.File, FileTools.GetFileSize(path)));
+                        }
                     }
                 }
 
-                if (fileSizes.Count > 0)
+                if (typesSizesList.Count > 0)
                 {
-                    long totalByteCount = fileSizes.Sum();
-                    string formattedSize = FileTools.FormatFileSize(totalByteCount);
-                    DragDropInfo = fileSizes.Count + " valid file(s), total size: " + formattedSize;
-                    ValidPreviewFiles = true;
+                    // count total size
+                    long totalByteCount = typesSizesList.Sum(x => x.Item2);
+
+                    // only one file or folder
+                    if (typesSizesList.Count == 1)
+                    {
+                        DragDropType = typesSizesList[0].Item1;
+                    }
+                    // more than one
+                    else
+                    {
+                        if (typesSizesList.GroupBy(x => x.Item1).Select(x => x.First()).ToList().Count == 1)
+                        {
+                            DragDropType = typesSizesList[0].Item1 + 1;
+                        }
+                        else
+                        {
+                            DragDropType = DragDropType.Multiple;
+                        }
+                    }
+
+                    DragDropInfo = typesSizesList.Count + " valid video file(s), total size: " + FileTools.FormatFileSize(totalByteCount);
                 }
                 else
                 {
                     DragDropInfo = "No valid files.";
-                    ValidPreviewFiles = false;
+                    DragDropType = DragDropType.Invalid;
                 }
             }
         }
