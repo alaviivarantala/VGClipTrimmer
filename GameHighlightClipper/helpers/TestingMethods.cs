@@ -195,7 +195,7 @@ namespace GameHighlightClipper.Helpers
         {
             using (Bitmap temp = new Bitmap(image))
             {
-                temp.Save(clips + "tempb/" + name + ".png");
+                temp.Save(clips + "tempb2/" + name + ".png");
             }
         }
     }

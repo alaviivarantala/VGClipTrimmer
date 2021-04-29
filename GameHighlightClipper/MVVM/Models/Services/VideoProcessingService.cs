@@ -129,14 +129,14 @@ namespace GameHighlightClipper.MVVM.Models.Services
             return results;
         }
 
-        public Tuple<int, bool> OCRImage(int seconds, byte[] imageBytes)
+        private Tuple<int, bool> OCRImage(int seconds, byte[] imageBytes)
         {
             bool result = false;
             using (MemoryStream memoryStream = new MemoryStream(imageBytes))
             {
                 using (Bitmap image = new Bitmap(memoryStream))
                 {
-                    using (Bitmap imageEdit = ResizeCleanImage(image))
+                    using (Bitmap imageEdit = ResizeCleanInvertImage(image))
                     {
                         string resultOCR = OCR(imageEdit);
                         if (resultOCR.ToLower().Contains("eliminated") || resultOCR.ToLower().Contains("knocked"))
@@ -150,14 +150,14 @@ namespace GameHighlightClipper.MVVM.Models.Services
             return new Tuple<int, bool>(seconds, result);
         }
 
-        private Bitmap ResizeCleanImage(Bitmap image)
+        private Bitmap ResizeCleanInvertImage(Bitmap image)
         {
             image = ImageEditing.ResizeImageSlow(image, 800, 158);
             image = ImageEditing.CleanImage(image);
             return image;
         }
 
-        public string OCR(Bitmap img)
+        private string OCR(Bitmap img)
         {
             string res = "";
             using (var engine = new TesseractEngine(@"./video/tessdata", "eng", EngineMode.Default))
