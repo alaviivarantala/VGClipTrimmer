@@ -2,7 +2,10 @@
 using GalaSoft.MvvmLight.CommandWpf;
 using GameHighlightClipper.MVVM.Models;
 using GameHighlightClipper.MVVM.Models.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameHighlightClipper.MVVM.ViewModels
@@ -10,6 +13,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
     public class VideoFileViewModel : ViewModelBase
     {
         private INLogLogger _nLogLogger;
+        private IVideoProcessingService _videoProcessingService;
 
         private VideoFile _videoFile;
         public VideoFile VideoFile
@@ -32,6 +36,13 @@ namespace GameHighlightClipper.MVVM.ViewModels
             set => Set(ref _processingProgress, value);
         }
 
+        private int _maxProgress;
+        public int MaxProgress
+        {
+            get => _maxProgress;
+            set => Set(ref _maxProgress, value);
+        }
+
         #region Commands
 
         public RelayCommand OpenFileLocationCommand => new RelayCommand(OpenFileLocationAction);
@@ -46,9 +57,14 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         #endregion Commands
 
-        public VideoFileViewModel(INLogLogger nLogLogger)
+        public VideoFileViewModel(INLogLogger nLogLogger, IVideoProcessingService videoProcessingService, VideoFile videoFile)
         {
             _nLogLogger = nLogLogger;
+            _videoProcessingService = videoProcessingService;
+
+            VideoFile = videoFile;
+            ProcessingProgress = videoFile.Processed;
+            MaxProgress = videoFile.VideoLength;
         }
 
         private void OpenFileLocation()
@@ -56,21 +72,22 @@ namespace GameHighlightClipper.MVVM.ViewModels
             Process.Start("explorer.exe", "/select, \"" + VideoFile.FilePath + "\"");
         }
 
-        private async void ProcessVideo()
+        public async void ProcessVideo()
         {
-            await Task.Delay(1000);
-            //VideoFileInfo videoFileInfo = await _videoProcessingService.GetVideoFileInfo(VideoFile);
-            /*
-            List<Task<VideoFileInfo>> taskList = new List<Task<VideoFileInfo>>();
-            taskList.Add(Task.Run(() => _videoProcessingService.GetVideoFileInfo(VideoFile)));
-            await Task.WhenAll(taskList);
-            VideoFileInfo videoFileInfo = taskList[0].Result;
-            await Task.Delay(1000);
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancelToken = tokenSource.Token;
             IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
-            await _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken);
-            */
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var res = await Task.Run(() => _videoProcessingService.ProcessVideoFileYield(VideoFile, videoProcessProgress, cancelToken));
+            stopwatch.Stop();
+            var x1 = stopwatch.Elapsed;
+            ProcessingProgress = 0;
+            stopwatch.Reset();
+            stopwatch.Start();
+            var results = await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
+            stopwatch.Stop();
+            var x2 = stopwatch.Elapsed;
         }
     }
 }

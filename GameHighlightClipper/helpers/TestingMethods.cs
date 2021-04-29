@@ -15,11 +15,11 @@ namespace GameHighlightClipper.Helpers
 
         public static async void PHM()
         {
-            string clips = "C:/clips/";
+            string clips = "C:/clips/vids/";
             await Task.Run(() => TestBatch(clips));
             //var r = FFmpeg.CutVideo(clips + "APEX2.mp4", clips + "outAPEX2.mp4", new TimeSpan(0, 0, 55), new TimeSpan(0, 3, 55));
             //TestingMethods.CreateImages(clips);
-            Utilities.ShutdownApp();
+            //Utilities.ShutdownApp();
         }
 
         public static void CreateImages(string clips)

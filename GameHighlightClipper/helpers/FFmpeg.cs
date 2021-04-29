@@ -66,6 +66,16 @@ namespace GameHighlightClipper.Helpers
             return bitmap;
         }
 
+        /// <summary>
+        /// Return frames from every second of video
+        /// </summary>
+        /// <param name="video">Time point in video</param>
+        /// <param name="width">File path to video file</param>
+        /// <param name="height">Time point in video</param>
+        /// <param name="x">File path to video file</param>
+        /// <param name="y">Time point in video</param>
+        /// <param name="readSize">File path to video file</param>
+        /// <returns></returns>
         public static List<byte[]> SnapshotEverySecond(string video, string width, string height, string x, string y, int readSize)
         {
             Process proc = new Process();
@@ -139,6 +149,77 @@ namespace GameHighlightClipper.Helpers
             proc.WaitForExit();
 
             return resultsList;
+        }
+
+        public static IEnumerable<byte[]> SnapshotEverySecondYield(string video, string width, string height, string x, string y, int readSize)
+        {
+            Process proc = new Process();
+            proc.StartInfo.FileName = "./video/ffmpeg/ffmpeg.exe";
+            proc.StartInfo.Arguments = "-i " + video + " -vf fps=1,crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png -f image2pipe -";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+            proc.StartInfo.RedirectStandardError = false;
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.EnableRaisingEvents = true;
+            proc.Start();
+
+            using (BinaryReader reader = new BinaryReader(proc.StandardOutput.BaseStream))
+            {
+                byte[] readBytes = null;
+                byte[] stash = new byte[0];
+                byte[] image = new byte[0];
+                int frameCount = 0;
+
+                do
+                {
+                    readBytes = reader.ReadBytes(readSize);
+
+                    byte[] pattern = new byte[] { 73, 69, 78, 68, 174, 66, 96, 130 };
+                    int[] results = ByteProcessing.Locate(readBytes, pattern);
+
+                    for (int i = 0; i < results.Length; i++)
+                    {
+                        results[i] += pattern.Length;
+                    }
+
+                    if (results.Length == 0)
+                    {
+                        stash = stash.ToList().Concat(readBytes.ToList()).ToArray();
+                    }
+                    else if (results.Length == 1)
+                    {
+                        image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                        frameCount++;
+                        stash = readBytes.Skip(results[0]).ToArray();
+                        yield return image;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < results.Length; i++)
+                        {
+                            if (i == 0)
+                            {
+                                image = stash.ToList().Concat(readBytes.Take(results[0]).ToList()).ToArray();
+                                frameCount++;
+                                yield return image;
+                            }
+                            else
+                            {
+                                image = readBytes.Skip(results[i - 1]).Take(results[i] - results[i - 1]).ToArray();
+                                frameCount++;
+
+                                if (i == results.Length - 1)
+                                {
+                                    stash = readBytes.Skip(results[i]).ToArray();
+                                }
+                                yield return image;
+                            }
+                        }
+                    }
+                } while (readBytes.Length != 0);
+            }
+
+            proc.WaitForExit();
         }
 
         public static List<byte[]> SnapshotsWithFPS(string video, int fps, int readSize)

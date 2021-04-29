@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ namespace GameHighlightClipper.MVVM.Models.Interfaces
     {
         VideoFile GetVideoFileInfo(string pathToVideo);
 
-        Task<object> ProcessVideoFile(string pathToVideo, IProgress<int> progress, CancellationToken token);
+        List<TimeSpan> ProcessVideoFile(VideoFile videoFile, IProgress<int> progress, CancellationToken token);
+        List<TimeSpan> ProcessVideoFileYield(VideoFile videoFile, IProgress<int> progress, CancellationToken token);
     }
 }

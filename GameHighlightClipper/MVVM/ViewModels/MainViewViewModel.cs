@@ -172,14 +172,8 @@ namespace GameHighlightClipper.MVVM.ViewModels
                 {
                     if (!string.IsNullOrWhiteSpace(videoFilePath))
                     {
-                        VideoFile videoFile = new VideoFile
-                        {
-                            FileName = new FileInfo(videoFilePath).Name,
-                            FilePath = videoFilePath,
-                            FileSize = FileTools.GetFileSize(videoFilePath)
-                        };
-                        VideoFileViewModel viewModel = new VideoFileViewModel(_nLogLogger);
-                        viewModel.VideoFile = videoFile;
+                        VideoFile videoFile = _videoProcessingService.GetVideoFileInfo(videoFilePath);
+                        VideoFileViewModel viewModel = new VideoFileViewModel(_nLogLogger, _videoProcessingService, videoFile);
                         VideoFiles.Add(viewModel);
                     }
                 }
@@ -190,21 +184,12 @@ namespace GameHighlightClipper.MVVM.ViewModels
             }
         }
 
-        private async void ProcessAllVideos()
+        private void ProcessAllVideos()
         {
-            await Task.Delay(1000);
-            //VideoFileInfo videoFileInfo = await _videoProcessingService.GetVideoFileInfo(VideoFile);
-            /*
-            List<Task<VideoFileInfo>> taskList = new List<Task<VideoFileInfo>>();
-            taskList.Add(Task.Run(() => _videoProcessingService.GetVideoFileInfo(VideoFile)));
-            await Task.WhenAll(taskList);
-            VideoFileInfo videoFileInfo = taskList[0].Result;
-            await Task.Delay(1000);
-            CancellationTokenSource tokenSource = new CancellationTokenSource();
-            CancellationToken cancelToken = tokenSource.Token;
-            IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
-            await _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken);
-            */
+            foreach (VideoFileViewModel videoFile in VideoFiles)
+            {
+                videoFile.ProcessVideo();
+            }
         }
     }
 }

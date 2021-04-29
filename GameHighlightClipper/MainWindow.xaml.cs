@@ -1,4 +1,5 @@
 ﻿using AdonisUI.Controls;
+using GameHighlightClipper.Helpers;
 
 namespace GameHighlightClipper
 {
