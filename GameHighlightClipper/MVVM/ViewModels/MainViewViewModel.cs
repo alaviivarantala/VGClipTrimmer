@@ -7,6 +7,7 @@ using GameHighlightClipper.MVVM.Models.Interfaces;
 using GameHighlightClipper.MVVM.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace GameHighlightClipper.MVVM.ViewModels
 {
@@ -15,9 +16,9 @@ namespace GameHighlightClipper.MVVM.ViewModels
         private INLogLogger _nLogLogger;
         private IVideoProcessingService _videoProcessingService;
 
-        private ObservableCollection<VideoFile> _videoFiles;
+        private ObservableCollection<VideoFileViewModel> _videoFiles = new ObservableCollection<VideoFileViewModel>();
 
-        public ObservableCollection<VideoFile> VideoFiles
+        public ObservableCollection<VideoFileViewModel> VideoFiles
         {
             get => _videoFiles;
             set => Set(ref _videoFiles, value);
@@ -26,17 +27,12 @@ namespace GameHighlightClipper.MVVM.ViewModels
         #region Commands
 
         public RelayCommand BrowseForFilesCommand => new RelayCommand(BrowseForFilesAction);
-
-        public RelayCommand OpenFileLocationCommand => new RelayCommand(OpenFileLocationAction);
-        public RelayCommand StartProcessingCommand => new RelayCommand(StartProcessingAction);
+        public RelayCommand StartProcessingAllCommand => new RelayCommand(StartProcessingAllAction);
 
         #region Actions
 
         private void BrowseForFilesAction() => BrowseForFiles();
-
-        private void OpenFileLocationAction() => OpenFileLocation();
-
-        private void StartProcessingAction() => ProcessVideo();
+        private void StartProcessingAllAction() => ProcessAllVideos();
 
         #endregion Actions
 
@@ -60,10 +56,13 @@ namespace GameHighlightClipper.MVVM.ViewModels
                     {
                         VideoFile videoFile = new VideoFile
                         {
+                            FileName = new FileInfo(videoFilePath).Name,
                             FilePath = videoFilePath,
                             FileSize = FileTools.GetFileSize(videoFilePath)
                         };
-                        VideoFiles.Add(videoFile);
+                        VideoFileViewModel viewModel = new VideoFileViewModel(_nLogLogger);
+                        viewModel.VideoFile = videoFile;
+                        VideoFiles.Add(viewModel);
                     }
                 }
             }
@@ -73,13 +72,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             }
         }
 
-        private void OpenFileLocation()
-        {
-            int index = 0;
-            Process.Start("explorer.exe", "/select, \"" + VideoFiles[index].FilePath + "\"");
-        }
-
-        private async void ProcessVideo()
+        private async void ProcessAllVideos()
         {
             await Task.Delay(1000);
             //VideoFileInfo videoFileInfo = await _videoProcessingService.GetVideoFileInfo(VideoFile);

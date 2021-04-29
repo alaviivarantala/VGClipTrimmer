@@ -4,18 +4,17 @@ using System.Windows.Data;
 
 namespace GameHighlightClipper.Converters
 {
-    public sealed class GtIntToBoolConverter : IValueConverter
+    public sealed class IntToBoolConverter : IValueConverter
     {
+        public int Value { get; set; }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is int number)
             {
-                return number > 0;
+                return number == Value;
             }
-            else
-            {
-                return false;
-            }
+            return Binding.DoNothing;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

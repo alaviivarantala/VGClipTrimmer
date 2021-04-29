@@ -14,13 +14,15 @@
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding VideoFile.FileName}" Width="250" />
+                <TextBlock Text="{Binding VideoFile.FileName}" Width="250"/>
                 <Button Content="📂" Width="35" Height="25" Margin="8 0" Command="{Binding OpenFileLocationCommand}" />
                 <Button Content="▶" Width="35" Height="25" Margin="8 0 0 0" Command="{Binding StartProcessingCommand}" />
             </StackPanel>
 
             <ProgressBar adonisExtensions:ProgressBarExtension.Content="{Binding ProgressBarText}" Minimum="0" Maximum="100" Height="25" Margin="0 4" helpers:ProgressBarSmoother.SmoothValue="{Binding ProcessingProgress}" />
+            <!--
             <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Width="24" Height="24" Focusable="False" />
+            -->
         </StackPanel>
     </Grid>
 </UserControl>

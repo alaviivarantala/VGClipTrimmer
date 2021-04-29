@@ -123,7 +123,8 @@
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\DDTEnumToColorConverter.cs" />
     <Compile Include="Converters\DDTEnumToIconConverter.cs" />
-    <Compile Include="Converters\GtIntToBoolConverter.cs" />
+    <Compile Include="Converters\IntToBoolConverter.cs" />
+    <Compile Include="Converters\IntToBoolInvertConverter.cs" />
     <Compile Include="Converters\InvertBoolConverter.cs" />
     <Compile Include="Helpers\DragDropType.cs" />
     <Compile Include="Helpers\ProgressBarSmoother.cs" />

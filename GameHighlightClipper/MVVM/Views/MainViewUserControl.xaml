@@ -7,28 +7,31 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:views="clr-namespace:GameHighlightClipper.MVVM.Views"
              xmlns:viewModels="clr-namespace:GameHighlightClipper.MVVM.ViewModels"
+             xmlns:converters="clr-namespace:GameHighlightClipper.Converters"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800"
-             DataContext="{Binding Source={StaticResource Locator}, Path=MainView}">
+             d:DesignHeight="450" 
+             d:DesignWidth="800">
 
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type viewModels:VideoFileViewModel}">
             <views:VideoFileUserControl />
         </DataTemplate>
+        <converters:IntToBoolConverter Value="0" x:Key="IntToBool" />
+        <converters:IntToBoolInvertConverter Value="0" x:Key="IntToBoolInv" />
     </UserControl.Resources>
 
     <Grid>
         <!--Displayed when no video files have been added-->
-        <Grid Opacity="1" IsHitTestVisible="True">
+        <Grid Opacity="1" IsHitTestVisible="{Binding VideoFiles.Count, Converter={StaticResource IntToBool}}">
 
             <Grid.Style>
                 <Style>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding DisplayDropZone}" Value="True">
+                        <DataTrigger Binding="{Binding VideoFiles.Count, Converter={StaticResource IntToBool}}" Value="True">
                             <DataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.3">
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -39,7 +42,7 @@
                             <DataTrigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3" />
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </DataTrigger.ExitActions>
@@ -66,16 +69,16 @@
         </Grid>
 
         <!--Shown when there's atleast one video file given-->
-        <Grid Opacity="0" IsHitTestVisible="False">
+        <Grid Opacity="0" IsHitTestVisible="{Binding VideoFiles.Count, Converter={StaticResource IntToBoolInv}}">
 
             <Grid.Style>
                 <Style>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding DisplayDropZone}" Value="True">
+                        <DataTrigger Binding="{Binding VideoFiles.Count, Converter={StaticResource IntToBoolInv}}" Value="True">
                             <DataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.3">
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -86,7 +89,7 @@
                             <DataTrigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3" />
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </DataTrigger.ExitActions>
@@ -95,7 +98,7 @@
                 </Style>
             </Grid.Style>
 
-            <Button Content="▶" Width="35" Height="25" Margin="8" Command="{Binding StartProcessingCommand}" HorizontalAlignment="Right" VerticalAlignment="Top" />
+            <Button Content="▶" Width="35" Height="25" Margin="8" Command="{Binding StartProcessingAllCommand}" HorizontalAlignment="Right" VerticalAlignment="Top" />
             <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
                 <ItemsControl Padding="64" ItemsSource="{Binding VideoFiles}" />
             </ScrollViewer>

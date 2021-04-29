@@ -15,11 +15,6 @@ namespace GameHighlightClipper.MVVM.ViewModels
             _container.RegisterType<INLogLogger, NLogLogger>();
         }
 
-        public MainViewViewModel MainView
-        {
-            get { return _container.Resolve<MainViewViewModel>(); }
-        }
-
         public MainWindowViewModel MainWindow
         {
             get { return _container.Resolve<MainWindowViewModel>(); }

@@ -20,24 +20,21 @@ namespace GameHighlightClipper.MVVM.ViewModels
         private bool _isEnglishLanguange = true;
         private bool _isDarkTheme = true;
 
-        private bool _displayDropZone = false;
-
-        public bool DisplayDropZone
-        {
-            get => _displayDropZone;
-            set => Set(ref _displayDropZone, value);
-        }
-
         private string _windowTitle;
-
         public string WindowTitle
         {
             get => _windowTitle;
             set => Set(ref _windowTitle, value);
         }
 
-        private string _languageSymbol = "🇪🇳";
+        private bool _displayDropZone = false;
+        public bool DisplayDropZone
+        {
+            get => _displayDropZone;
+            set => Set(ref _displayDropZone, value);
+        }
 
+        private string _languageSymbol = "🇪🇳";
         public string LanguageSymbol
         {
             get => _languageSymbol;
@@ -45,7 +42,6 @@ namespace GameHighlightClipper.MVVM.ViewModels
         }
 
         private string _dragDropInfo = string.Empty;
-
         public string DragDropInfo
         {
             get => _dragDropInfo;
@@ -53,11 +49,17 @@ namespace GameHighlightClipper.MVVM.ViewModels
         }
 
         private DragDropType _dragDropType;
-
         public DragDropType DragDropType
         {
             get => _dragDropType;
             set => Set(ref _dragDropType, value);
+        }
+
+        private MainViewViewModel _mainView;
+        public MainViewViewModel MainView
+        {
+            get => _mainView;
+            set => Set(ref _mainView, value);
         }
 
         #region Commands
@@ -90,6 +92,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             _nLogLogger = nLogLogger;
             _videoProcessingService = videoProcessingService;
             WindowTitle = "Game Highlight Clipper - " + Assembly.GetExecutingAssembly().GetName().Version;
+            MainView = new MainViewViewModel(_nLogLogger, _videoProcessingService);
         }
 
         private void PreviewDragEnter(DragEventArgs e)

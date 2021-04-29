@@ -7,6 +7,7 @@
                              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                              xmlns:converters="clr-namespace:GameHighlightClipper.Converters"
                              xmlns:views="clr-namespace:GameHighlightClipper.MVVM.Views"
+                             xmlns:viewModels="clr-namespace:GameHighlightClipper.MVVM.ViewModels"
                              Title="{Binding WindowTitle}"
                              FontFamily="Segoe UI"
                              IconVisibility="Collapsed"
@@ -16,6 +17,9 @@
                              DataContext="{Binding Source={StaticResource Locator}, Path=MainWindow}">
 
     <Window.Resources>
+        <DataTemplate DataType="{x:Type viewModels:MainViewViewModel}">
+            <views:MainViewUserControl />
+        </DataTemplate>
         <converters:InvertBoolConverter x:Key="InvertBool" />
         <converters:DDTEnumToColorConverter x:Key="DDTEnumToColor" />
         <converters:DDTEnumToIconConverter x:Key="DDTEnumToIcon" />
@@ -81,7 +85,7 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <views:MainViewUserControl />
+            <ContentControl Content="{Binding MainView}"/>
         </Grid>
 
         <!--Grid faded in when dragging and dropping-->
