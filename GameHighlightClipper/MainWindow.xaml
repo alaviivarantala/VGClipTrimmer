@@ -3,11 +3,8 @@
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
-                             xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
-                             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                              xmlns:converters="clr-namespace:GameHighlightClipper.Converters"
                              xmlns:views="clr-namespace:GameHighlightClipper.MVVM.Views"
-                             xmlns:viewModels="clr-namespace:GameHighlightClipper.MVVM.ViewModels"
                              Title="{Binding WindowTitle}"
                              FontFamily="Segoe UI"
                              IconVisibility="Collapsed"
@@ -15,16 +12,7 @@
                              WindowButtonHighlightBrush="{StaticResource HighlightBrush}"
                              Width="1280" Height="720" MinWidth="640" MinHeight="360"
                              DataContext="{Binding Source={StaticResource Locator}, Path=MainWindow}">
-
-    <Window.Resources>
-        <DataTemplate DataType="{x:Type viewModels:MainViewViewModel}">
-            <views:MainViewUserControl />
-        </DataTemplate>
-        <converters:InvertBoolConverter x:Key="InvertBool" />
-        <converters:DDTEnumToColorConverter x:Key="DDTEnumToColor" />
-        <converters:DDTEnumToIconConverter x:Key="DDTEnumToIcon" />
-    </Window.Resources>
-
+    
     <adonisControls:AdonisWindow.TitleBarContent>
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right">
@@ -43,84 +31,8 @@
         </StackPanel>
     </adonisControls:AdonisWindow.TitleBarContent>
 
-    <Grid AllowDrop="True" Background="Transparent">
-        <!--Event handlers for dragging and dropping-->
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="PreviewDragEnter">
-                <mvvm:EventToCommand Command="{Binding PreviewDragEnterCommand, Mode=OneWay}" PassEventArgsToCommand="True" />
-            </i:EventTrigger>
-            <i:EventTrigger EventName="PreviewDragLeave">
-                <mvvm:EventToCommand Command="{Binding PreviewDragLeaveCommand, Mode=OneWay}" PassEventArgsToCommand="True" />
-            </i:EventTrigger>
-            <i:EventTrigger EventName="PreviewDrop">
-                <mvvm:EventToCommand Command="{Binding PreviewDropCommand, Mode=OneWay}" PassEventArgsToCommand="True" />
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
-
-        <!--Grid contains the first start view-->
-        <Grid Opacity="1" IsHitTestVisible="{Binding DisplayDropZone, Converter={StaticResource InvertBool}}">
-            <Grid.Style>
-                <Style>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DisplayDropZone}" Value="True">
-                            <DataTrigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.3">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.EnterActions>
-                            <DataTrigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.ExitActions>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-            <ContentControl Content="{Binding MainView}"/>
-        </Grid>
-
-        <!--Grid faded in when dragging and dropping-->
-        <Grid Opacity="0" IsHitTestVisible="{Binding DisplayDropZone}">
-            <Grid.Style>
-                <Style>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding DisplayDropZone}" Value="True">
-                            <DataTrigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.EnterActions>
-                            <DataTrigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.ExitActions>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
-                <ContentControl Foreground="{Binding DragDropType, Converter={StaticResource DDTEnumToColor}}" Content="{Binding DragDropType, Converter={StaticResource DDTEnumToIcon}}" Width="175" Height="225" />
-                <TextBlock Text="{Binding DragDropInfo}" HorizontalAlignment="Center" Margin="20" FontSize="36" />
-            </StackPanel>
-            <Rectangle Margin="8" IsHitTestVisible="False" RadiusX="16" RadiusY="16" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" StrokeDashArray="8 4" StrokeThickness="4" />
-        </Grid>
+    <Grid>
+        <views:MainViewUserControl />
     </Grid>
+    
 </adonisControls:AdonisWindow>

@@ -1,6 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models.Interfaces;
@@ -8,6 +7,9 @@ using GameHighlightClipper.MVVM.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Windows;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GameHighlightClipper.MVVM.ViewModels
 {
@@ -16,8 +18,28 @@ namespace GameHighlightClipper.MVVM.ViewModels
         private INLogLogger _nLogLogger;
         private IVideoProcessingService _videoProcessingService;
 
-        private ObservableCollection<VideoFileViewModel> _videoFiles = new ObservableCollection<VideoFileViewModel>();
+        private bool _displayDropZone = false;
+        public bool DisplayDropZone
+        {
+            get => _displayDropZone;
+            set => Set(ref _displayDropZone, value);
+        }
 
+        private string _dragDropInfo = string.Empty;
+        public string DragDropInfo
+        {
+            get => _dragDropInfo;
+            set => Set(ref _dragDropInfo, value);
+        }
+
+        private DragDropType _dragDropType;
+        public DragDropType DragDropType
+        {
+            get => _dragDropType;
+            set => Set(ref _dragDropType, value);
+        }
+
+        private ObservableCollection<VideoFileViewModel> _videoFiles = new ObservableCollection<VideoFileViewModel>();
         public ObservableCollection<VideoFileViewModel> VideoFiles
         {
             get => _videoFiles;
@@ -26,10 +48,18 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         #region Commands
 
+        public RelayCommand<DragEventArgs> PreviewDragEnterCommand => new RelayCommand<DragEventArgs>((e) => PreviewDragEnterAction(e), (e) => true);
+        public RelayCommand<DragEventArgs> PreviewDragLeaveCommand => new RelayCommand<DragEventArgs>((e) => PreviewDragLeaveAction(e), (e) => true);
+        public RelayCommand<DragEventArgs> PreviewDropCommand => new RelayCommand<DragEventArgs>((e) => PreviewDropAction(e), (e) => true);
+
         public RelayCommand BrowseForFilesCommand => new RelayCommand(BrowseForFilesAction);
         public RelayCommand StartProcessingAllCommand => new RelayCommand(StartProcessingAllAction);
 
         #region Actions
+
+        private void PreviewDragEnterAction(DragEventArgs e) => PreviewDragEnter(e);
+        private void PreviewDragLeaveAction(DragEventArgs e) => PreviewDragLeave(e);
+        private void PreviewDropAction(DragEventArgs e) => PreviewDrop(e);
 
         private void BrowseForFilesAction() => BrowseForFiles();
         private void StartProcessingAllAction() => ProcessAllVideos();
@@ -42,6 +72,94 @@ namespace GameHighlightClipper.MVVM.ViewModels
         {
             _nLogLogger = nLogLogger;
             _videoProcessingService = videoProcessingService;
+        }
+
+        private void PreviewDragEnter(DragEventArgs e)
+        {
+            DisplayDropZone = true;
+            e.Handled = true;
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] paths = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                List<Tuple<DragDropType, long>> typesSizesList = new List<Tuple<DragDropType, long>>();
+
+                foreach (string path in paths)
+                {
+                    // is directory
+                    if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+                    {
+                        var files = Directory.EnumerateFiles(path, ".", SearchOption.AllDirectories);
+                        foreach (var file in files)
+                        {
+                            if (FileTools.IsVideoFile(file))
+                            {
+                                typesSizesList.Add(new Tuple<DragDropType, long>(DragDropType.Folder, FileTools.GetFileSize(file)));
+                            }
+                        }
+                    }
+                    // is file
+                    else
+                    {
+                        if (FileTools.IsVideoFile(path))
+                        {
+                            typesSizesList.Add(new Tuple<DragDropType, long>(DragDropType.File, FileTools.GetFileSize(path)));
+                        }
+                    }
+                }
+
+                if (typesSizesList.Count > 0)
+                {
+                    // count total size
+                    long totalByteCount = typesSizesList.Sum(x => x.Item2);
+
+                    // only one file or folder
+                    if (typesSizesList.Count == 1)
+                    {
+                        DragDropType = typesSizesList[0].Item1;
+                    }
+                    // more than one
+                    else
+                    {
+                        if (typesSizesList.GroupBy(x => x.Item1).Select(x => x.First()).ToList().Count == 1)
+                        {
+                            DragDropType = typesSizesList[0].Item1 + 1;
+                        }
+                        else
+                        {
+                            DragDropType = DragDropType.Multiple;
+                        }
+                    }
+
+                    DragDropInfo = typesSizesList.Count + " valid video file(s), total size: " + FileTools.FormatFileSize(totalByteCount);
+                }
+                else
+                {
+                    DragDropInfo = "No valid files.";
+                    DragDropType = DragDropType.Invalid;
+                }
+            }
+        }
+
+        private void PreviewDragLeave(DragEventArgs e)
+        {
+            DisplayDropZone = false;
+            e.Handled = true;
+        }
+
+        private void PreviewDrop(DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] paths = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                //ParseFiles(paths);
+
+                DisplayDropZone = false;
+                e.Handled = true;
+                //CommandManager.InvalidateRequerySuggested();
+            }
         }
 
         private void BrowseForFiles()
