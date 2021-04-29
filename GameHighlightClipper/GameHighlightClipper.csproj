@@ -136,6 +136,8 @@
     <Compile Include="MVVM\ViewModels\MainViewViewModel.cs" />
     <Compile Include="MVVM\ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Helpers\TestingMethods.cs" />
+    <Compile Include="Video\Processing\TesseractParse.cs" />
+    <Compile Include="Video\Processing\TesseractService.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -153,7 +155,7 @@
       <DependentUpon>VideoFileUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Video\Processing\ByteProcessing.cs" />
-    <Compile Include="Helpers\FFmpeg.cs" />
+    <Compile Include="Video\Processing\FFmpeg.cs" />
     <Compile Include="MVVM\Models\GameEnum.cs" />
     <Compile Include="Helpers\FileTools.cs" />
     <Compile Include="MVVM\Models\Highlight.cs" />
