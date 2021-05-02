@@ -201,11 +201,11 @@ namespace GameHighlightClipper.Helpers
             proc.WaitForExit();
         }
 
-        public static List<byte[]> SnapshotsWithFPS(string video, int fps, int readSize)
+        public static List<byte[]> SnapshotsWithFPS(string video, int fps, string width, string height, string x, string y, int readSize)
         {
             Process proc = new Process();
             proc.StartInfo.FileName = "./video/ffmpeg/ffmpeg.exe";
-            proc.StartInfo.Arguments = "-i " + video + " -vf fps=1/" + fps + " -vcodec png -f image2pipe -";
+            proc.StartInfo.Arguments = "-i " + video + " -vf fps=1/" + fps + ", crop=" + width + ":" + height + ":" + x + ":" + y + " -vcodec png -f image2pipe -";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardError = false;

@@ -1,4 +1,6 @@
 ﻿using GameHighlightClipper.MVVM.Models.Interfaces;
+using GameHighlightClipper.MVVM.Models.Services;
+using NLog;
 using System;
 using System.Windows;
 
@@ -9,7 +11,7 @@ namespace GameHighlightClipper
     /// </summary>
     public partial class App : Application
     {
-        private INLogLogger logger;
+        private INLogLogger logger = new NLogLogger();
 
         public App()
         {

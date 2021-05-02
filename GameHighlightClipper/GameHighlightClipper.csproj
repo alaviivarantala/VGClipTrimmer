@@ -132,6 +132,7 @@
     <Compile Include="Helpers\Timeline.cs" />
     <Compile Include="Helpers\TimelineEvent.cs" />
     <Compile Include="Helpers\Utilities.cs" />
+    <Compile Include="Helpers\VideoProcessingProgress.cs" />
     <Compile Include="MVVM\Models\Interfaces\INLogLogger.cs" />
     <Compile Include="MVVM\Models\Interfaces\IVideoProcessingService.cs" />
     <Compile Include="MVVM\Models\Services\NLogLogger.cs" />
@@ -142,8 +143,6 @@
     <Compile Include="MVVM\Views\TimelineUserControl.xaml.cs">
       <DependentUpon>TimelineUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Video\Processing\TesseractParse.cs" />
-    <Compile Include="Video\Processing\TesseractService.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

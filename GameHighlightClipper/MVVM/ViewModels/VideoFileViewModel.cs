@@ -73,6 +73,19 @@ namespace GameHighlightClipper.MVVM.ViewModels
             VideoFile = videoFile;
             ProcessingProgress = videoFile.Processed;
             MaxProgress = videoFile.VideoLength;
+
+            Timeline first = new Timeline();
+            first.Duration = new TimeSpan(1, 0, 0);
+            first.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 15, 0), Duration = new TimeSpan(0, 15, 0) });
+            first.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 40, 0), Duration = new TimeSpan(0, 10, 0) });
+            Timelines.Add(first);
+
+            Timeline second = new Timeline();
+            second.Duration = new TimeSpan(1, 0, 0);
+            second.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 0, 0), Duration = new TimeSpan(0, 25, 0) });
+            second.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 30, 0), Duration = new TimeSpan(0, 15, 0) });
+            second.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 50, 0), Duration = new TimeSpan(0, 10, 0) });
+            Timelines.Add(second);
         }
 
         private void OpenFileLocation()
