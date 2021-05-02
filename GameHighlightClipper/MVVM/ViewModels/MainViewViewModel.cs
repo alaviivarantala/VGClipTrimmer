@@ -155,31 +155,33 @@ namespace GameHighlightClipper.MVVM.ViewModels
             {
                 string[] paths = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                //ParseFiles(paths);
+                ParsePaths(paths);
 
                 DisplayDropZone = false;
                 e.Handled = true;
-                //CommandManager.InvalidateRequerySuggested();
             }
         }
 
         private void BrowseForFiles()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            string[] paths = FileTools.SelectVideoFiles();
+            ParsePaths(paths);
+
+        }
+
+        private void ParsePaths(string[] paths)
+        {
             try
             {
-                string[] videoFilePaths = FileTools.SelectVideoFiles();
-
-                foreach (string videoFilePath in videoFilePaths)
+                foreach (string path in paths)
                 {
-                    if (!string.IsNullOrWhiteSpace(videoFilePath))
+                    if (!string.IsNullOrWhiteSpace(path))
                     {
                         VideoFile videoFile = new VideoFile
                         {
-                            FileName = new FileInfo(videoFilePath).Name,
-                            FilePath = videoFilePath,
-                            FileSize = FileTools.GetFileSize(videoFilePath),
+                            FileName = new FileInfo(path).Name,
+                            FilePath = path,
+                            FileSize = FileTools.GetFileSize(path),
                             Processed = 0
                         };
                         VideoFileViewModel viewModel = new VideoFileViewModel(_nLogLogger, _videoProcessingService, videoFile);
@@ -189,9 +191,8 @@ namespace GameHighlightClipper.MVVM.ViewModels
             }
             catch (Exception ex)
             {
-                _nLogLogger.LogError(ex, "MainViewViewModel; BrowseForFiles");
+                _nLogLogger.LogError(ex, "MainViewViewModel; ParsePaths");
             }
-            var x = stopwatch.Elapsed;
         }
 
         private void ProcessAllVideos()

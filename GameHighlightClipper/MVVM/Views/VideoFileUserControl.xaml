@@ -59,7 +59,8 @@
 
             <Grid>
                 <TextBlock Text="0" HorizontalAlignment="Left"/>
-                <TextBlock Text="5:31" HorizontalAlignment="Right"/>
+                <TextBlock Text="0" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding VideoFile.VideoLength}" HorizontalAlignment="Right"/>
             </Grid>
             
             <!--

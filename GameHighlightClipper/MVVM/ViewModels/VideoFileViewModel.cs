@@ -53,7 +53,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
         #region Commands
 
         public RelayCommand OpenFileLocationCommand => new RelayCommand(OpenFileLocationAction);
-        public RelayCommand StartProcessingCommand => new RelayCommand(StartProcessingAction);
+        public RelayCommand StartProcessingCommand => new RelayCommand(StartProcessingAction, ProgressBarText == "Waiting");
 
         #region Actions
 
@@ -82,22 +82,32 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         public async void ProcessVideo()
         {
-            ProgressBarText = "Reading video file info...";
-            VideoFile = _videoProcessingService.GetVideoFileInfo(VideoFile);
-            MaxProgress = VideoFile.VideoLength;
-            Timeline.Duration = new TimeSpan(0, 0, MaxProgress);
-            ProgressBarText = "Processing video file...";
-            CancellationTokenSource tokenSource = new CancellationTokenSource();
-            CancellationToken cancelToken = tokenSource.Token;
-            IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
-
-            var results = await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
-
-            foreach (var result in results)
+            try
             {
-                Timeline.Events.Add(new TimelineEvent() { Start = result, Duration = new TimeSpan(0, 0, 5) });
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                ProgressBarText = "Reading video file info...";
+                VideoFile = _videoProcessingService.GetVideoFileInfo(VideoFile);
+                MaxProgress = VideoFile.VideoLength;
+                Timeline.Duration = new TimeSpan(0, 0, MaxProgress);
+                ProgressBarText = "Processing video file...";
+                CancellationTokenSource tokenSource = new CancellationTokenSource();
+                CancellationToken cancelToken = tokenSource.Token;
+                IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
+
+                var results = await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
+
+                foreach (var result in results)
+                {
+                    Timeline.Events.Add(new TimelineEvent() { Start = result, Duration = new TimeSpan(0, 0, 5) });
+                }
+                ProgressBarText = "Video file processed in " + stopwatch.Elapsed;
             }
-            ProgressBarText = "Video file processed!";
+            catch (Exception ex)
+            {
+                _nLogLogger.LogError(ex, "VideoFileViewModel; ProcessVideo");
+                ProgressBarText = "!!!Error processing video file!!!";
+            }
         }
     }
 }
