@@ -1,9 +1,10 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models;
 using GameHighlightClipper.MVVM.Models.Interfaces;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,13 @@ namespace GameHighlightClipper.MVVM.ViewModels
             set => Set(ref _maxProgress, value);
         }
 
+        private ObservableCollection<Timeline> _timelines = new ObservableCollection<Timeline>();
+        public ObservableCollection<Timeline> Timelines
+        {
+            get => _timelines;
+            set => Set(ref _timelines, value);
+        }
+
         #region Commands
 
         public RelayCommand OpenFileLocationCommand => new RelayCommand(OpenFileLocationAction);
@@ -74,6 +82,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         public async void ProcessVideo()
         {
+            ProgressBarText = "Reading video file info...";
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancelToken = tokenSource.Token;
             IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
@@ -81,6 +90,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             stopwatch.Start();
             var res = await Task.Run(() => _videoProcessingService.ProcessVideoFileYield(VideoFile, videoProcessProgress, cancelToken));
             stopwatch.Stop();
+            ProgressBarText = "Processing video file...";
             var x1 = stopwatch.Elapsed;
             ProcessingProgress = 0;
             stopwatch.Reset();

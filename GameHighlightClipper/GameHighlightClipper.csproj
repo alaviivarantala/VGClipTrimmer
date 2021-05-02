@@ -123,11 +123,14 @@
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\DDTEnumToColorConverter.cs" />
     <Compile Include="Converters\DDTEnumToIconConverter.cs" />
+    <Compile Include="Converters\TimelineConverter.cs" />
     <Compile Include="Converters\IntToBoolConverter.cs" />
     <Compile Include="Converters\IntToBoolInvertConverter.cs" />
     <Compile Include="Converters\InvertBoolConverter.cs" />
     <Compile Include="Helpers\DragDropType.cs" />
     <Compile Include="Helpers\ProgressBarSmoother.cs" />
+    <Compile Include="Helpers\Timeline.cs" />
+    <Compile Include="Helpers\TimelineEvent.cs" />
     <Compile Include="Helpers\Utilities.cs" />
     <Compile Include="MVVM\Models\Interfaces\INLogLogger.cs" />
     <Compile Include="MVVM\Models\Interfaces\IVideoProcessingService.cs" />
@@ -136,6 +139,9 @@
     <Compile Include="MVVM\ViewModels\MainViewViewModel.cs" />
     <Compile Include="MVVM\ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Helpers\TestingMethods.cs" />
+    <Compile Include="MVVM\Views\TimelineUserControl.xaml.cs">
+      <DependentUpon>TimelineUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Video\Processing\TesseractParse.cs" />
     <Compile Include="Video\Processing\TesseractService.cs" />
     <Page Include="MainWindow.xaml">
@@ -169,6 +175,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MVVM\Views\MainViewUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\Views\TimelineUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

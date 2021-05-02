@@ -10,11 +10,6 @@ namespace GameHighlightClipper.Helpers
 {
     public class FFmpeg
     {
-        /// <summary>
-        /// Read a video file with ffprobe and return information
-        /// </summary>
-        /// <param name="video">File path to video file</param>
-        /// <returns></returns>
         public static string Info(string video)
         {
             string result = string.Empty;
@@ -38,12 +33,6 @@ namespace GameHighlightClipper.Helpers
             return result;
         }
 
-        /// <summary>
-        /// Return single frame from a video at specific time point
-        /// </summary>
-        /// <param name="time">Time point in video</param>
-        /// <param name="video">File path to video file</param>
-        /// <returns></returns>
         public static Bitmap Snapshot(TimeSpan time, string video)
         {
             Bitmap bitmap = null;
@@ -66,16 +55,6 @@ namespace GameHighlightClipper.Helpers
             return bitmap;
         }
 
-        /// <summary>
-        /// Return frames from every second of video
-        /// </summary>
-        /// <param name="video">Time point in video</param>
-        /// <param name="width">File path to video file</param>
-        /// <param name="height">Time point in video</param>
-        /// <param name="x">File path to video file</param>
-        /// <param name="y">Time point in video</param>
-        /// <param name="readSize">File path to video file</param>
-        /// <returns></returns>
         public static List<byte[]> SnapshotEverySecond(string video, string width, string height, string x, string y, int readSize)
         {
             Process proc = new Process();
