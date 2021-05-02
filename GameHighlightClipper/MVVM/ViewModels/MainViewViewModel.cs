@@ -172,7 +172,14 @@ namespace GameHighlightClipper.MVVM.ViewModels
                 {
                     if (!string.IsNullOrWhiteSpace(videoFilePath))
                     {
-                        VideoFile videoFile = _videoProcessingService.GetVideoFileInfo(videoFilePath);
+                        VideoFile videoFile = new VideoFile
+                        {
+                            MD5Sum = FileTools.CalculateMD5(videoFilePath),
+                            FileName = new FileInfo(videoFilePath).Name,
+                            FilePath = videoFilePath,
+                            FileSize = FileTools.GetFileSize(videoFilePath),
+                            Processed = 0
+                        };
                         VideoFileViewModel viewModel = new VideoFileViewModel(_nLogLogger, _videoProcessingService, videoFile);
                         VideoFiles.Add(viewModel);
                     }

@@ -14,19 +14,10 @@ namespace GameHighlightClipper.MVVM.Models.Services
 {
     public class VideoProcessingService : IVideoProcessingService
     {
-        public VideoFile GetVideoFileInfo(string pathToVideo)
+        public VideoFile GetVideoFileInfo(VideoFile videoFile)
         {
-            VideoFile videoFile = new VideoFile
-            {
-                MD5Sum = FileTools.CalculateMD5(pathToVideo),
-                FileName = new FileInfo(pathToVideo).Name,
-                FilePath = pathToVideo,
-                FileSize = FileTools.GetFileSize(pathToVideo),
-                Processed = 0
-            };
-
             // ffmpeg probe output in one string
-            string ffmpegProbeOut = FFmpeg.Info(pathToVideo);
+            string ffmpegProbeOut = FFmpeg.Info(videoFile.FilePath);
 
             // we convert returns (\r) to newlines (\n) for easier time splitting the string
             // each line contains key=value

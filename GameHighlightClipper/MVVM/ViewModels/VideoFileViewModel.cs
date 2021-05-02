@@ -72,8 +72,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
             VideoFile = videoFile;
             ProcessingProgress = videoFile.Processed;
-            MaxProgress = videoFile.VideoLength;
-
+            /*
             Timeline first = new Timeline();
             first.Duration = new TimeSpan(1, 0, 0);
             first.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 15, 0), Duration = new TimeSpan(0, 15, 0) });
@@ -86,6 +85,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             second.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 30, 0), Duration = new TimeSpan(0, 15, 0) });
             second.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 50, 0), Duration = new TimeSpan(0, 10, 0) });
             Timelines.Add(second);
+            */
         }
 
         private void OpenFileLocation()
@@ -96,6 +96,12 @@ namespace GameHighlightClipper.MVVM.ViewModels
         public async void ProcessVideo()
         {
             ProgressBarText = "Reading video file info...";
+            VideoFile = _videoProcessingService.GetVideoFileInfo(VideoFile);
+            MaxProgress = VideoFile.VideoLength;
+            Timeline timeline = new Timeline();
+            timeline.Duration = new TimeSpan(0, 0, MaxProgress);
+            Timelines.Add(timeline);
+            ProgressBarText = "Processing video file...";
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancelToken = tokenSource.Token;
             IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
@@ -103,7 +109,6 @@ namespace GameHighlightClipper.MVVM.ViewModels
             stopwatch.Start();
             var res = await Task.Run(() => _videoProcessingService.ProcessVideoFileYield(VideoFile, videoProcessProgress, cancelToken));
             stopwatch.Stop();
-            ProgressBarText = "Processing video file...";
             var x1 = stopwatch.Elapsed;
             ProcessingProgress = 0;
             stopwatch.Reset();
