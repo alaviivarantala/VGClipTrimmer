@@ -159,6 +159,7 @@
                     <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
                         <ItemsControl Padding="64" ItemsSource="{Binding VideoFiles}" />
                     </ScrollViewer>
+
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" >
                         <Button Content="▶" Width="35" Height="25" Margin="8" Command="{Binding StartProcessingAllCommand}" />
                         <Button Content="⏸︎" Width="35" Height="25" Margin="8" Command="{Binding PauseProcessingAllCommand}" />

@@ -10,6 +10,7 @@ using System.IO;
 using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace GameHighlightClipper.MVVM.ViewModels
 {
@@ -164,6 +165,8 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         private void BrowseForFiles()
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             try
             {
                 string[] videoFilePaths = FileTools.SelectVideoFiles();
@@ -174,7 +177,6 @@ namespace GameHighlightClipper.MVVM.ViewModels
                     {
                         VideoFile videoFile = new VideoFile
                         {
-                            MD5Sum = FileTools.CalculateMD5(videoFilePath),
                             FileName = new FileInfo(videoFilePath).Name,
                             FilePath = videoFilePath,
                             FileSize = FileTools.GetFileSize(videoFilePath),
@@ -189,6 +191,7 @@ namespace GameHighlightClipper.MVVM.ViewModels
             {
                 _nLogLogger.LogError(ex, "MainViewViewModel; BrowseForFiles");
             }
+            var x = stopwatch.Elapsed;
         }
 
         private void ProcessAllVideos()

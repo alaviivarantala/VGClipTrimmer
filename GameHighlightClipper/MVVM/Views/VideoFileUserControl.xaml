@@ -25,42 +25,43 @@
 
             <ProgressBar adonisExtensions:ProgressBarExtension.Content="{Binding ProgressBarText}" Minimum="0" Maximum="{Binding MaxProgress}" Height="25" Margin="0 4" helpers:ProgressBarSmoother.SmoothValue="{Binding ProcessingProgress}" />
 
-            <Grid>
-                <ItemsControl ItemsSource="{Binding Path=Timelines}">
+            <TextBlock Text="Highlights" Margin="0, 0, 0, 2"/>
+
+            <Grid DataContext="{Binding Timeline}">
+                <ItemsControl x:Name="Timeline" ItemsSource="{Binding Events}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Grid x:Name="EventContainer" Height="20" Margin="0" Background="WhiteSmoke"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <ItemsControl x:Name="Timeline" ItemsSource="{Binding Path=Events}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Grid x:Name="EventContainer" Height="20" Margin="5" Background="Gainsboro"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Rectangle Grid.Column="1" Fill="Green" VerticalAlignment="Stretch" HorizontalAlignment="Left">
-                                            <Rectangle.Margin>
-                                                <MultiBinding Converter="{StaticResource TimelineConverter}">
-                                                    <Binding ElementName="Timeline" Path="DataContext.Duration"/>
-                                                    <Binding Path="Start"/>
-                                                    <Binding ElementName="EventContainer" Path="ActualWidth"/>
-                                                </MultiBinding>
-                                            </Rectangle.Margin>
-                                            <Rectangle.Width>
-                                                <MultiBinding Converter="{StaticResource TimelineConverter}">
-                                                    <Binding ElementName="Timeline" Path="DataContext.Duration"/>
-                                                    <Binding Path="Duration"/>
-                                                    <Binding ElementName="EventContainer" Path="ActualWidth"/>
-                                                </MultiBinding>
-                                            </Rectangle.Width>
-                                        </Rectangle>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                            <Rectangle Grid.Column="1" Fill="Green" VerticalAlignment="Stretch" HorizontalAlignment="Left">
+                                <Rectangle.Margin>
+                                    <MultiBinding Converter="{StaticResource TimelineConverter}">
+                                        <Binding ElementName="Timeline" Path="DataContext.Duration"/>
+                                        <Binding Path="Start"/>
+                                        <Binding ElementName="EventContainer" Path="ActualWidth"/>
+                                    </MultiBinding>
+                                </Rectangle.Margin>
+                                <Rectangle.Width>
+                                    <MultiBinding Converter="{StaticResource TimelineConverter}">
+                                        <Binding ElementName="Timeline" Path="DataContext.Duration"/>
+                                        <Binding Path="Duration"/>
+                                        <Binding ElementName="EventContainer" Path="ActualWidth"/>
+                                    </MultiBinding>
+                                </Rectangle.Width>
+                            </Rectangle>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
 
+            <Grid>
+                <TextBlock Text="0" HorizontalAlignment="Left"/>
+                <TextBlock Text="5:31" HorizontalAlignment="Right"/>
+            </Grid>
+            
             <!--
             <ProgressBar adonisExtensions:ProgressBarExtension.Content="{Binding ProgressBarText}" Minimum="0" Maximum="{Binding MaxProgress}" Height="25" Margin="0 4" helpers:ProgressBarSmoother.SmoothValue="{Binding ProcessingProgress}" />
             <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Width="24" Height="24" Focusable="False" />

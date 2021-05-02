@@ -4,7 +4,6 @@ using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models;
 using GameHighlightClipper.MVVM.Models.Interfaces;
 using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,25 +29,25 @@ namespace GameHighlightClipper.MVVM.ViewModels
             set => Set(ref _progressBarText, value);
         }
 
-        private int _processingProgress;
+        private int _processingProgress = 0;
         public int ProcessingProgress
         {
             get => _processingProgress;
             set => Set(ref _processingProgress, value);
         }
 
-        private int _maxProgress;
+        private int _maxProgress = 1;
         public int MaxProgress
         {
             get => _maxProgress;
             set => Set(ref _maxProgress, value);
         }
 
-        private ObservableCollection<Timeline> _timelines = new ObservableCollection<Timeline>();
-        public ObservableCollection<Timeline> Timelines
+        private Timeline _timeline = new Timeline();
+        public Timeline Timeline
         {
-            get => _timelines;
-            set => Set(ref _timelines, value);
+            get => _timeline;
+            set => Set(ref _timeline, value);
         }
 
         #region Commands
@@ -72,20 +71,8 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
             VideoFile = videoFile;
             ProcessingProgress = videoFile.Processed;
-            /*
-            Timeline first = new Timeline();
-            first.Duration = new TimeSpan(1, 0, 0);
-            first.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 15, 0), Duration = new TimeSpan(0, 15, 0) });
-            first.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 40, 0), Duration = new TimeSpan(0, 10, 0) });
-            Timelines.Add(first);
-
-            Timeline second = new Timeline();
-            second.Duration = new TimeSpan(1, 0, 0);
-            second.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 0, 0), Duration = new TimeSpan(0, 25, 0) });
-            second.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 30, 0), Duration = new TimeSpan(0, 15, 0) });
-            second.Events.Add(new TimelineEvent() { Start = new TimeSpan(0, 50, 0), Duration = new TimeSpan(0, 10, 0) });
-            Timelines.Add(second);
-            */
+            ProcessingProgress = videoFile.VideoLength;
+            ProgressBarText = "Waiting";
         }
 
         private void OpenFileLocation()
@@ -98,24 +85,19 @@ namespace GameHighlightClipper.MVVM.ViewModels
             ProgressBarText = "Reading video file info...";
             VideoFile = _videoProcessingService.GetVideoFileInfo(VideoFile);
             MaxProgress = VideoFile.VideoLength;
-            Timeline timeline = new Timeline();
-            timeline.Duration = new TimeSpan(0, 0, MaxProgress);
-            Timelines.Add(timeline);
+            Timeline.Duration = new TimeSpan(0, 0, MaxProgress);
             ProgressBarText = "Processing video file...";
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancelToken = tokenSource.Token;
             IProgress<int> videoProcessProgress = new Progress<int>(update => { ProcessingProgress += update; });
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            var res = await Task.Run(() => _videoProcessingService.ProcessVideoFileYield(VideoFile, videoProcessProgress, cancelToken));
-            stopwatch.Stop();
-            var x1 = stopwatch.Elapsed;
-            ProcessingProgress = 0;
-            stopwatch.Reset();
-            stopwatch.Start();
+
             var results = await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
-            stopwatch.Stop();
-            var x2 = stopwatch.Elapsed;
+
+            foreach (var result in results)
+            {
+                Timeline.Events.Add(new TimelineEvent() { Start = result, Duration = new TimeSpan(0, 0, 5) });
+            }
+            ProgressBarText = "Video file processed!";
         }
     }
 }
