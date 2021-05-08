@@ -25,7 +25,7 @@ namespace GameHighlightClipper.Helpers
         public static void CreateImages(string clips)
         {
             string video = clips + "APEX2.mp4";
-            string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+            string[] lines = FFmpeg.Info(video).Item1.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
             int ww = int.Parse(lines.Where(x => x.Contains("width=")).FirstOrDefault().Split('=')[1]);
             int hh = int.Parse(lines.Where(x => x.Contains("height=")).FirstOrDefault().Split('=')[1]);
@@ -58,7 +58,7 @@ namespace GameHighlightClipper.Helpers
             Parallel.For(0, frames, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
             {
                 TimeSpan span = new TimeSpan(0, 0, fps * i);
-                Bitmap image = FFmpeg.Snapshot(span, video);
+                Bitmap image = FFmpeg.Snapshot(video, span);
                 for (int j = 0; j < 4; j++)
                 {
                     cropped[i].Add(ImageEditing.CropImage(image, positions[j].Item1, positions[j].Item2));
@@ -117,7 +117,7 @@ namespace GameHighlightClipper.Helpers
         {
             string video = clips + "APEX3.mp4";
 
-            string[] lines = FFmpeg.Info(video).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+            string[] lines = FFmpeg.Info(video).Item1.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
             int ww = int.Parse(lines.Where(x => x.Contains("width=")).FirstOrDefault().Split('=')[1]);
             int hh = int.Parse(lines.Where(x => x.Contains("height=")).FirstOrDefault().Split('=')[1]);

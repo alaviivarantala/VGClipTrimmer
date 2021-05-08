@@ -157,7 +157,13 @@
                     </Grid.Style>
 
                     <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-                        <ItemsControl Padding="64" ItemsSource="{Binding VideoFiles}" />
+                        <ItemsControl Padding="16" ItemsSource="{Binding VideoFiles}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
                     </ScrollViewer>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" >

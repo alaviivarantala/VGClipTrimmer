@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GameHighlightClipper.MVVM.Models.Interfaces
 {
     public interface IVideoProcessingService
     {
-        VideoFile GetVideoFileInfo(VideoFile videoFile);
+        Task<VideoFile> GetVideoFileInfo(VideoFile videoFile);
 
-        List<TimeSpan> ProcessVideoFile(VideoFile videoFile, IProgress<int> progress, CancellationToken token);
-        List<TimeSpan> ProcessVideoFileYield(VideoFile videoFile, IProgress<int> progress, CancellationToken token);
+        Task<List<TimeSpan>> ProcessVideoFile(VideoFile videoFile, IProgress<int> progress, CancellationToken token);
     }
 }

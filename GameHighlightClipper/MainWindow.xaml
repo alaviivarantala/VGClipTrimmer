@@ -3,14 +3,14 @@
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
                              xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
-                             xmlns:converters="clr-namespace:GameHighlightClipper.Converters"
                              xmlns:views="clr-namespace:GameHighlightClipper.MVVM.Views"
                              Title="{Binding WindowTitle}"
                              FontFamily="Segoe UI"
                              IconVisibility="Collapsed"
                              TitleBarBackground="{StaticResource VIFadeInverseBrush}"
                              WindowButtonHighlightBrush="{StaticResource HighlightBrush}"
-                             Width="1280" Height="720" MinWidth="640" MinHeight="360"
+                             Width="1082" Height="720" MinWidth="570" MinHeight="570"
+                             WindowStartupLocation="CenterScreen"
                              DataContext="{Binding Source={StaticResource Locator}, Path=MainWindow}">
     
     <adonisControls:AdonisWindow.TitleBarContent>

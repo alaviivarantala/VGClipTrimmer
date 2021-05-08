@@ -4,6 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:helpers="clr-namespace:GameHighlightClipper.Helpers"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              xmlns:converters="clr-namespace:GameHighlightClipper.Converters"
              mc:Ignorable="d"
@@ -11,17 +14,26 @@
 
     <UserControl.Resources>
         <converters:TimelineConverter x:Key="TimelineConverter"/>
+        <converters:BitmapToImageSourceConterver x:Key="BitmapToImageSource"/>
     </UserControl.Resources>
-    
-    <Grid>
 
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+    <Grid Margin="16">
 
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding VideoFile.FileName}" Width="250"/>
-                <Button Content="📂" Width="35" Height="25" Margin="8 0" Command="{Binding OpenFileLocationCommand}" />
-                <Button Content="▶" Width="35" Height="25" Margin="8 0 0 0" Command="{Binding StartProcessingCommand}" />
-            </StackPanel>
+        <StackPanel>
+            <Grid Width="480" Height="270" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Width="24" Height="24" Focusable="False" />
+                <Image Source="{Binding VideoFile.Thumbnail, Converter={StaticResource BitmapToImageSource}}" />
+            </Grid>
+
+            <Grid Margin="0 8 0 4">
+                <TextBlock Text="{Binding VideoFile.FileName}" FontSize="14" Width="250" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" Margin="0 0 0 0" HorizontalAlignment="Right" >
+                    <Button Content="▶" Width="35" Height="25" Margin="0 0 4 0" Command="{Binding StartProcessingCommand}" Background="Green"/>
+                    <Button Content="📂" Width="35" Height="25" Margin="4 0" Command="{Binding OpenFileLocationCommand}" Background="Blue"/>
+                    <Button Content="❌" Width="35" Height="25" Margin="4 0 0 0" Command="{Binding RemoveVideoFileCommand}" Background="Red"/>
+                </StackPanel>
+            </Grid>
+
 
             <ProgressBar adonisExtensions:ProgressBarExtension.Content="{Binding ProgressBarText}" Minimum="0" Maximum="{Binding MaxProgress}" Height="25" Margin="0 4" helpers:ProgressBarSmoother.SmoothValue="{Binding ProcessingProgress}" />
 
@@ -36,7 +48,12 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Rectangle Grid.Column="1" Fill="Green" VerticalAlignment="Stretch" HorizontalAlignment="Left">
+                            <Rectangle Grid.Column="1" Fill="Green" VerticalAlignment="Stretch" HorizontalAlignment="Left" ToolTip="{Binding Start}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <mvvm:EventToCommand Command="{Binding DataContext.OpenMediaPlayerCommand, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                                 <Rectangle.Margin>
                                     <MultiBinding Converter="{StaticResource TimelineConverter}">
                                         <Binding ElementName="Timeline" Path="DataContext.Duration"/>
@@ -65,7 +82,6 @@
             
             <!--
             <ProgressBar adonisExtensions:ProgressBarExtension.Content="{Binding ProgressBarText}" Minimum="0" Maximum="{Binding MaxProgress}" Height="25" Margin="0 4" helpers:ProgressBarSmoother.SmoothValue="{Binding ProcessingProgress}" />
-            <ContentControl ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.LoadingCircle}}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" Width="24" Height="24" Focusable="False" />
             -->
         </StackPanel>
     </Grid>

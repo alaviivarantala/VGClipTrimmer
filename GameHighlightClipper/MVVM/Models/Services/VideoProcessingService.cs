@@ -14,14 +14,19 @@ namespace GameHighlightClipper.MVVM.Models.Services
 {
     public class VideoProcessingService : IVideoProcessingService
     {
-        public VideoFile GetVideoFileInfo(VideoFile videoFile)
+        public async Task<VideoFile> GetVideoFileInfo(VideoFile videoFile)
         {
+            INLogLogger logger = new NLogLogger();
+
             // ffmpeg probe output in one string
-            string ffmpegProbeOut = FFmpeg.Info(videoFile.FilePath);
+            Tuple<string, string> ffmpegProbeOut = FFmpeg.Info(videoFile.FilePath);
+
+            logger.LogInfo("GetVideoFileInfo:ffmpegProbeOut:Results: " + ffmpegProbeOut.Item1);
+            logger.LogError("GetVideoFileInfo:ffmpegProbeOut:Errors: " + ffmpegProbeOut.Item2);
 
             // we convert returns (\r) to newlines (\n) for easier time splitting the string
             // each line contains key=value
-            string[] probeLines = ffmpegProbeOut.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+            string[] probeLines = ffmpegProbeOut.Item1.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
             // grab video width and height from probe output
             videoFile.Width = int.Parse(probeLines.Where(x => x.Contains("width=")).FirstOrDefault().Split('=')[1]);
@@ -42,10 +47,12 @@ namespace GameHighlightClipper.MVVM.Models.Services
             string[] duration = probeLines.Where(x => x.Contains("duration=")).FirstOrDefault().Split('=')[1].Split('.')[0].Split(':');
             videoFile.VideoLength = (int)new TimeSpan(int.Parse(duration[0]), int.Parse(duration[1]), int.Parse(duration[2])).TotalSeconds;
 
+            videoFile.Thumbnail = FFmpeg.Snapshot(videoFile.FilePath, new TimeSpan(0, 0, videoFile.VideoLength / 2));
+
             return videoFile;
         }
 
-        public List<TimeSpan> ProcessVideoFileYield(VideoFile videoFile, IProgress<int> progress, CancellationToken token)
+        public async Task<List<TimeSpan>> ProcessVideoFile(VideoFile videoFile, IProgress<int> progress, CancellationToken token)
         {
             int ww = videoFile.Width;
             int hh = videoFile.Height;
@@ -60,52 +67,7 @@ namespace GameHighlightClipper.MVVM.Models.Services
 
             List<Tuple<int, bool>> tuples = new List<Tuple<int, bool>>();
 
-            var images = FFmpeg.SnapshotEverySecondYield(videoFile.FilePath, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), 307200);
-            /*
-            foreach (var image in images)
-            {
-                tuples.Add(OCRImage(tuples.Count + 1, image));
-                progress.Report(1);
-            }
-            */
-
-            int maxDegreeOfParallelism = Environment.ProcessorCount;
-            /*
-            Parallel.For(0, images.Count, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
-            {
-                var image = images.ElementAt(i);
-                tuples.Add(OCRImage(i, image));
-                progress.Report(1);
-            });
-            */
-            Parallel.ForEach(images, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
-            {
-                tuples.Add(OCRImage(tuples.Count, i));
-                progress.Report(1);
-            });
-
-            List<TimeSpan> results = tuples.Where(result => result.Item2).Select(time => TimeSpan.FromSeconds(time.Item1)).ToList();
-            results.Sort();
-
-            return results;
-        }
-
-        public List<TimeSpan> ProcessVideoFile(VideoFile videoFile, IProgress<int> progress, CancellationToken token)
-        {
-            int ww = videoFile.Width;
-            int hh = videoFile.Height;
-            int length = videoFile.VideoLength;
-
-            double widthMultiplier = 0.25;
-            double heightMultiplier = 0.05;
-            int width = (int)(ww * widthMultiplier / 1.75);
-            int height = (int)(hh * heightMultiplier);
-            int startingPointX = (int)((ww / 2) - (width / 1.4));
-            int startingPointY = (int)((hh * 0.75) - (height / 0.9));
-
-            List<Tuple<int, bool>> tuples = new List<Tuple<int, bool>>();
-
-            List<byte[]> images = FFmpeg.SnapshotEverySecond(videoFile.FilePath, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), 307200);
+            List<byte[]> images = FFmpeg.SnapshotEverySecondProgress(videoFile.FilePath, width.ToString(), height.ToString(), startingPointX.ToString(), startingPointY.ToString(), 307200, progress);
 
             int maxDegreeOfParallelism = Environment.ProcessorCount;
             Parallel.For(0, images.Count, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, (i) =>
