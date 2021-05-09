@@ -27,6 +27,7 @@ namespace GameHighlightClipper.Converters
                     bitmapImage.EndInit();
                     return bitmapImage;
                 }
+                return Binding.DoNothing;
             }
             return Binding.DoNothing;
         }

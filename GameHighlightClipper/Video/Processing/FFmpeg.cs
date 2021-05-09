@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using GameHighlightClipper.Video.Processing;
+using Microsoft.WindowsAPICodePack.Shell;
 
 namespace GameHighlightClipper.Helpers
 {
@@ -33,24 +34,29 @@ namespace GameHighlightClipper.Helpers
             return new Tuple<string, string>(results, errors);
         }
 
+        public static Bitmap Thumbnail(string video)
+        {
+            ShellFile shellFile = ShellFile.FromFilePath(video);
+            return shellFile.Thumbnail.Bitmap;
+        }
+
         public static Bitmap Snapshot(string video, TimeSpan time)
         {
-            Bitmap bitmap = null;
+            Process process = new Process();
+            process.StartInfo.FileName = "./video/ffmpeg/ffmpeg.exe";
+            process.StartInfo.Arguments = "-ss " + time.ToString() + " -i \"" + video + "\" -vframes 1 -vcodec png -f image2pipe -";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardError = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.Start();
 
-            using (Process process = new Process())
+            Bitmap bitmap;
+            using (var stream = process.StandardOutput.BaseStream)
             {
-                process.StartInfo.FileName = "./video/ffmpeg/ffmpeg.exe";
-                process.StartInfo.Arguments = "-ss " + time.ToString() + " -i \"" + video + "\" -vframes 1 -vcodec png -f image2pipe -";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardError = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.Start();
-
-                bitmap = new Bitmap(process.StandardOutput.BaseStream);
-
-                process.WaitForExit();
+                bitmap = new Bitmap(stream);
             }
+            process.WaitForExit();
 
             return bitmap;
         }

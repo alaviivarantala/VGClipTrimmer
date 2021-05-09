@@ -159,7 +159,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <ItemsControl Padding="16" ItemsSource="{Binding VideoFiles}">
+                            <ItemsControl Padding="16" ItemsSource="{Binding VideoFiles}" VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel />

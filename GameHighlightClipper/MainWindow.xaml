@@ -9,7 +9,7 @@
                              IconVisibility="Collapsed"
                              TitleBarBackground="{StaticResource VIFadeInverseBrush}"
                              WindowButtonHighlightBrush="{StaticResource HighlightBrush}"
-                             Width="1082" Height="720" MinWidth="570" MinHeight="570"
+                             Width="1088" Height="660" MinWidth="558" MinHeight="560"
                              WindowStartupLocation="CenterScreen"
                              DataContext="{Binding Source={StaticResource Locator}, Path=MainWindow}">
     
