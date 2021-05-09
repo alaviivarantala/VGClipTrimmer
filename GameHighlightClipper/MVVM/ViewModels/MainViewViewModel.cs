@@ -175,23 +175,47 @@ namespace GameHighlightClipper.MVVM.ViewModels
             {
                 foreach (string path in paths)
                 {
-                    if (!string.IsNullOrWhiteSpace(path))
+                    // is directory
+                    if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
                     {
-                        VideoFile videoFile = new VideoFile
+                        var files = Directory.EnumerateFiles(path, ".", SearchOption.AllDirectories);
+                        foreach (var file in files)
                         {
-                            FileName = new FileInfo(path).Name,
-                            FilePath = path,
-                            FileSize = FileTools.GetFileSize(path),
-                            Processed = 0
-                        };
-                        VideoFileViewModel viewModel = new VideoFileViewModel(_nLogLogger, _videoProcessingService, videoFile);
-                        VideoFiles.Add(viewModel);
+                            if (FileTools.IsVideoFile(file))
+                            {
+                                VideoFile videoFile = new VideoFile
+                                {
+                                    FileName = new FileInfo(file).Name,
+                                    FilePath = file,
+                                    FileSize = FileTools.GetFileSize(file),
+                                    Processed = 0
+                                };
+                                VideoFileViewModel viewModel = new VideoFileViewModel(_nLogLogger, _videoProcessingService, videoFile, this);
+                                VideoFiles.Add(viewModel);
+                            }
+                        }
+                    }
+                    // is file
+                    else
+                    {
+                        if (FileTools.IsVideoFile(path))
+                        {
+                            VideoFile videoFile = new VideoFile
+                            {
+                                FileName = new FileInfo(path).Name,
+                                FilePath = path,
+                                FileSize = FileTools.GetFileSize(path),
+                                Processed = 0
+                            };
+                            VideoFileViewModel viewModel = new VideoFileViewModel(_nLogLogger, _videoProcessingService, videoFile, this);
+                            VideoFiles.Add(viewModel);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                _nLogLogger.LogError(ex, "MainViewViewModel; ParsePaths");
+                _nLogLogger.LogError(ex, "MainViewViewModel:ParsePaths");
             }
         }
 

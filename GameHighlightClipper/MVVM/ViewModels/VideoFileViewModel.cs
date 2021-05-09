@@ -4,6 +4,8 @@ using GameHighlightClipper.Helpers;
 using GameHighlightClipper.MVVM.Models;
 using GameHighlightClipper.MVVM.Models.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +17,8 @@ namespace GameHighlightClipper.MVVM.ViewModels
     {
         private INLogLogger _nLogLogger;
         private IVideoProcessingService _videoProcessingService;
+
+        private MainViewViewModel _mainViewViewModel;
 
         private bool _canStartProcessing = false;
 
@@ -57,22 +61,26 @@ namespace GameHighlightClipper.MVVM.ViewModels
 
         public RelayCommand OpenFileLocationCommand => new RelayCommand(OpenFileLocationAction);
         public RelayCommand StartProcessingCommand => new RelayCommand(StartProcessingAction, () => _canStartProcessing);
+        public RelayCommand RemoveVideoFileCommand => new RelayCommand(RemoveVideoFileAction);
         public RelayCommand<MouseEventArgs> OpenMediaPlayerCommand => new RelayCommand<MouseEventArgs>((e) => OpenMediaPlayerAction(e), (e) => true);
 
         #region Actions
 
         private void OpenFileLocationAction() => OpenFileLocation();
         private void StartProcessingAction() => ProcessVideo();
+        private void RemoveVideoFileAction() => RemoveVideoFile();
         private void OpenMediaPlayerAction(MouseEventArgs e) => OpenMediaPlayer(e);
         
         #endregion Actions
 
         #endregion Commands
 
-        public VideoFileViewModel(INLogLogger nLogLogger, IVideoProcessingService videoProcessingService, VideoFile videoFile)
+        public VideoFileViewModel(INLogLogger nLogLogger, IVideoProcessingService videoProcessingService, VideoFile videoFile, MainViewViewModel mainViewViewModel)
         {
             _nLogLogger = nLogLogger;
             _videoProcessingService = videoProcessingService;
+
+            _mainViewViewModel = mainViewViewModel;
 
             VideoFile = videoFile;
             ProcessingProgress = videoFile.Processed;
@@ -86,19 +94,23 @@ namespace GameHighlightClipper.MVVM.ViewModels
             Process.Start("explorer.exe", "/select, \"" + VideoFile.FilePath + "\"");
         }
 
+        private void RemoveVideoFile()
+        {
+            _mainViewViewModel.VideoFiles.Remove(this);
+        }
+
         private void OpenMediaPlayer(MouseEventArgs e)
         {
-            var x1 = Utilities.GetPathForExe("VLC.exe");
-
             if (e.OriginalSource is System.Windows.Shapes.Rectangle rectangle)
             {
                 if (rectangle.DataContext is TimelineEvent timelineEvent)
                 {
+                    var x1 = Utilities.GetPathForExe("VLC.exe");
                     if (!string.IsNullOrWhiteSpace(x1))
                     {
                         Process proc = new Process();
                         proc.StartInfo.FileName = x1;
-                        proc.StartInfo.Arguments = "\"" + VideoFile.FilePath + "\" --start-time " + (timelineEvent.Start.TotalSeconds - 10) + " --stop-time " + (timelineEvent.Start.TotalSeconds + 10);
+                        proc.StartInfo.Arguments = "\"" + VideoFile.FilePath + "\" --start-time " + (timelineEvent.Start.TotalSeconds) + " --stop-time " + (timelineEvent.Start.TotalSeconds+timelineEvent.Duration.TotalSeconds);
                         proc.Start();
                     }
                 }
@@ -111,14 +123,13 @@ namespace GameHighlightClipper.MVVM.ViewModels
             {
                 ProgressBarText = "Reading video file info...";
                 VideoFile = await Task.Run(() => _videoProcessingService.GetVideoFileInfo(VideoFile));
-                MaxProgress = VideoFile.VideoLength * 2;
-                ProgressBarText = "Read video file info!";
-                _canStartProcessing = true;
-                StartProcessingCommand.RaiseCanExecuteChanged();
+                MaxProgress = VideoFile.VideoLength;
+                ProgressBarText = "Ready to process video file.";
+                ChangeCanProcessVideo(true);
             }
             catch (Exception ex)
             {
-                _nLogLogger.LogTrace(ex, "Error in GetVideoFileInfo!");
+                _nLogLogger.LogTrace(ex, "VideoFileViewModel:GetVideoFileInfo!");
                 ProgressBarText = "!!!ERROR READING VIDEO FILE!!!";
             }
         }
@@ -127,41 +138,75 @@ namespace GameHighlightClipper.MVVM.ViewModels
         {
             try
             {
-                _canStartProcessing = false;
-                StartProcessingCommand.RaiseCanExecuteChanged();
+                ChangeCanProcessVideo(false);
+                ProgressBarText = "Processing video file, step 1: FFMPEG";
+                ProcessingProgress = 0;
+                Timeline = new Timeline();
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                Timeline.Duration = new TimeSpan(0, 0, MaxProgress / 2);
-                ProgressBarText = "Processing video file Step 1: FFMPEG";
+                Timeline.Duration = new TimeSpan(0, 0, MaxProgress);
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
                 CancellationToken cancelToken = tokenSource.Token;
+                bool firstStep = true;
                 IProgress<int> videoProcessProgress = new Progress<int>(update => 
                 { 
                     ProcessingProgress += update;
-                    if (ProcessingProgress == MaxProgress / 2)
+                    if (ProcessingProgress == MaxProgress && firstStep)
                     {
-                        ProgressBarText = "Processing video file Step 2: Tesseract-OCR";
+                        ProgressBarText = "Processing video file, step 2: Tesseract-OCR";
+                        firstStep = false;
+                        ProcessingProgress = 0;
                     }
                 });
 
-                var results = await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
+                List<TimeSpan> results = await Task.Run(() => _videoProcessingService.ProcessVideoFile(VideoFile, videoProcessProgress, cancelToken));
 
-                foreach (var result in results)
-                {
-                    Timeline.Events.Add(new TimelineEvent() { Start = result, Duration = new TimeSpan(0, 0, 5) });
-                }
-                ProgressBarText = "Video file processed in " + RoundSeconds(stopwatch.Elapsed);
+                Timeline.Events = new ObservableCollection<TimelineEvent>(MergeTimesSpans(results));
+
+                ProgressBarText = "Video file processed in " + TimeSpan.FromSeconds(Math.Round(stopwatch.Elapsed.TotalSeconds));
+                ChangeCanProcessVideo(true);
             }
             catch (Exception ex)
             {
-                _nLogLogger.LogError(ex, "VideoFileViewModel; ProcessVideo");
-                ProgressBarText = "!!!Error processing video file!!!";
+                _nLogLogger.LogError(ex, "VideoFileViewModel:ProcessVideo");
+                ProgressBarText = "!!!ERROR PROCESSING VIDEO FILE!!!";
             }
         }
 
-        public static TimeSpan RoundSeconds(TimeSpan span)
+        private List<TimelineEvent> MergeTimesSpans(List<TimeSpan> timeSpans)
         {
-            return TimeSpan.FromSeconds(Math.Round(span.TotalSeconds));
+            List<TimelineEvent> timelineEvents = new List<TimelineEvent>();
+
+            Tuple<TimeSpan, TimeSpan> previous = null;
+
+            foreach (TimeSpan span in timeSpans)
+            {
+                Tuple<TimeSpan, TimeSpan> current = new Tuple<TimeSpan, TimeSpan>(span.Subtract(new TimeSpan(0, 0, 5)), span.Add(new TimeSpan(0, 0, 5)));
+                if (previous == null)
+                {
+                    previous = current;
+                }
+                // no overlap
+                else if (current.Item1 > previous.Item2)
+                {
+                    timelineEvents.Add(new TimelineEvent() { Start = previous.Item1, Duration = previous.Item2-previous.Item1 });
+                    previous = current;
+                }
+                // overlap
+                else
+                {
+                    previous = new Tuple<TimeSpan, TimeSpan>(previous.Item1, new TimeSpan(0, 0, (int)Math.Max(previous.Item2.TotalSeconds, current.Item2.TotalSeconds)));
+                }
+            }
+            timelineEvents.Add(new TimelineEvent() { Start = previous.Item1, Duration = previous.Item2 - previous.Item1 });
+
+            return timelineEvents;
+        }
+
+        private void ChangeCanProcessVideo(bool canProcess)
+        {
+            _canStartProcessing = canProcess;
+            StartProcessingCommand.RaiseCanExecuteChanged();
         }
     }
 }

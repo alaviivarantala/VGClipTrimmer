@@ -10,11 +10,13 @@
              xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
              xmlns:converters="clr-namespace:GameHighlightClipper.Converters"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             Height="440" Width="515">
 
     <UserControl.Resources>
         <converters:TimelineConverter x:Key="TimelineConverter"/>
         <converters:BitmapToImageSourceConterver x:Key="BitmapToImageSource"/>
+        <converters:TimelineEventStringConverter x:Key="TimelineEventString"/>
+        <converters:SecondsTimeSpanConverter x:Key="SecondsTimeSpan"/>
     </UserControl.Resources>
 
     <Grid Margin="16">
@@ -28,9 +30,9 @@
             <Grid Margin="0 8 0 4">
                 <TextBlock Text="{Binding VideoFile.FileName}" FontSize="14" Width="250" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <StackPanel Orientation="Horizontal" Margin="0 0 0 0" HorizontalAlignment="Right" >
-                    <Button Content="▶" Width="35" Height="25" Margin="0 0 4 0" Command="{Binding StartProcessingCommand}" Background="Green"/>
-                    <Button Content="📂" Width="35" Height="25" Margin="4 0" Command="{Binding OpenFileLocationCommand}" Background="Blue"/>
-                    <Button Content="❌" Width="35" Height="25" Margin="4 0 0 0" Command="{Binding RemoveVideoFileCommand}" Background="Red"/>
+                    <Button Content="▶" Width="35" Height="25" Margin="0 0 4 0" Command="{Binding StartProcessingCommand}" />
+                    <Button Content="📂" Width="35" Height="25" Margin="4 0" Command="{Binding OpenFileLocationCommand}" />
+                    <Button Content="❌" Width="35" Height="25" Margin="4 0 0 0" Command="{Binding RemoveVideoFileCommand}" />
                 </StackPanel>
             </Grid>
 
@@ -48,7 +50,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Rectangle Grid.Column="1" Fill="Green" VerticalAlignment="Stretch" HorizontalAlignment="Left" ToolTip="{Binding Start}">
+                            <Rectangle Grid.Column="1" Fill="Green" VerticalAlignment="Stretch" HorizontalAlignment="Left" ToolTip="{Binding Converter={StaticResource TimelineEventString}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseDown">
                                         <mvvm:EventToCommand Command="{Binding DataContext.OpenMediaPlayerCommand, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" PassEventArgsToCommand="True"/>
@@ -77,7 +79,7 @@
             <Grid>
                 <TextBlock Text="0" HorizontalAlignment="Left"/>
                 <TextBlock Text="0" HorizontalAlignment="Center"/>
-                <TextBlock Text="{Binding VideoFile.VideoLength}" HorizontalAlignment="Right"/>
+                <TextBlock Text="{Binding VideoFile.VideoLength, Converter={StaticResource SecondsTimeSpan}}" HorizontalAlignment="Right"/>
             </Grid>
             
             <!--

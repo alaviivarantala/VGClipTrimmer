@@ -12,27 +12,9 @@ namespace GameHighlightClipper.Helpers
             Application.Current.Shutdown();
         }
 
-        public static string LocateEXE(string filename)
-        {
-            string path = Environment.GetEnvironmentVariable("path");
-            string[] folders = path.Split(';');
-            foreach (string folder in folders)
-            {
-                if (File.Exists(folder + filename))
-                {
-                    return folder + filename;
-                }
-                else if (File.Exists(folder + "\\" + filename))
-                {
-                    return folder + "\\" + filename;
-                }
-            }
-            return string.Empty;
-        }
-
-        private const string keyBase = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths";
         public static string GetPathForExe(string fileName)
         {
+            string keyBase = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths";
             RegistryKey localMachine = Registry.LocalMachine;
             RegistryKey fileKey = localMachine.OpenSubKey(string.Format(@"{0}\{1}", keyBase, fileName));
             object result = null;

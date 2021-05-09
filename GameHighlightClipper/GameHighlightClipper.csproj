@@ -127,10 +127,12 @@
     <Compile Include="Converters\DDTEnumToColorConverter.cs" />
     <Compile Include="Converters\DDTEnumToIconConverter.cs" />
     <Compile Include="Converters\MathConverter.cs" />
+    <Compile Include="Converters\SecondsTimeSpanConverter.cs" />
     <Compile Include="Converters\TimelineConverter.cs" />
     <Compile Include="Converters\IntToBoolConverter.cs" />
     <Compile Include="Converters\IntToBoolInvertConverter.cs" />
     <Compile Include="Converters\InvertBoolConverter.cs" />
+    <Compile Include="Converters\TimelineEventStringConverter.cs" />
     <Compile Include="Helpers\DragDropType.cs" />
     <Compile Include="Helpers\ProgressBarSmoother.cs" />
     <Compile Include="Helpers\Timeline.cs" />
